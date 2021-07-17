@@ -4,6 +4,7 @@ import yajscript.YajInterpreter
 import yajscript.backend.type.*
 import yajscript.backend.type.Double
 import yajscript.backend.type.String
+import yajscript.backend.Error
 import kotlin.math.exp
 
 /**
@@ -59,16 +60,25 @@ class Lexer(interpreter: YajInterpreter) {
         tokens.clear()
     }
 
-    fun getLocation() {
-
+    fun getLine() : kotlin.String {
+        if (splitLines == null) {
+            splitLines = source.split("\n")
+        }
+        return splitLines!![line]
     }
 
-    fun error() {
+    var splitLines: List<kotlin.String>? = null
 
+    fun unexpectedTokenError(offset : Int = 0) {
+        errors.add(
+            Error("Unexpected token", getLine(), line, col)
+        )
     }
 
-    fun stringEndOfLineError() {
-
+    fun stringEndOfLineError(offset : Int = 0) {
+        errors.add(
+            Error("Unterminated string literal", getLine(), line, col + if (line == 0) 1 else -1)
+        )
     }
 
     /**
@@ -354,11 +364,15 @@ class Lexer(interpreter: YajInterpreter) {
 
         while (!curIs(endChar)) {
             if (peekIs('\n')) {
-                newLine()
                 if (!multiLine) {
-                    stringEndOfLineError()
+                    stringEndOfLineError(0)
                     break
+                } else {
+                    newLine()
                 }
+            } else if (atEnd()) {
+                stringEndOfLineError(0)
+                return
             }
 
             endIndex++
@@ -368,7 +382,6 @@ class Lexer(interpreter: YajInterpreter) {
         val string : kotlin.String = source.substring(startIndex, endIndex)
         addToken(String(string))
 
-        endIndex++
         increment()
     }
 
@@ -439,7 +452,7 @@ class Lexer(interpreter: YajInterpreter) {
                     addToken(TokenType.OR)
                     increment = 2
                 } else {
-                    error()
+                    unexpectedTokenError()
                 }
             }
             '&' -> {
@@ -447,7 +460,7 @@ class Lexer(interpreter: YajInterpreter) {
                     addToken(TokenType.AND)
                     increment = 2
                 } else {
-                    error()
+                    unexpectedTokenError()
                 }
             }
 
@@ -458,6 +471,11 @@ class Lexer(interpreter: YajInterpreter) {
                 } else {
                     addToken(TokenType.ASSIGN_P)
                 }
+            }
+
+            // No suitable token found
+            else -> {
+                unexpectedTokenError()
             }
         }
 
