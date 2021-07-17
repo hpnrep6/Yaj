@@ -1,4 +1,6 @@
 package yajscript.backend
 
-class Interpreter {
+import yajscript.YajInterpreter
+
+class Interpreter(interpreter: YajInterpreter) {
 }

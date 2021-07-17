@@ -1,4 +1,8 @@
 package yajscript.backend
 
-class Parser {
+import yajscript.YajInterpreter
+
+class Parser(interpreter: YajInterpreter) {
+
+    val errors: MutableList<Error> = mutableListOf<Error>()
 }
