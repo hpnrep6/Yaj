@@ -7,6 +7,7 @@ import yajscript.backend.Token
 
 class YajInterpreter (source : String) {
     val source = source
+    val digitSeparator = '.'
 
     private var lexer : Lexer = Lexer(this)
     private var parser : Parser = Parser(this)

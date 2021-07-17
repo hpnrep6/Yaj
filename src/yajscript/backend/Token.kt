@@ -1,13 +1,14 @@
 package yajscript.backend
 
+import yajscript.backend.type.Type
+
 enum class TokenType {
 // Variable types
-    LITERAL,
-    NULL,
+    NULL,           // null value
+    BOOL,           // boolean value
 
 // Variables reference
-    VAR_NAME,
-    FUNC_NAME,
+    INDENTIFIER,
 
 // Assignment
     ASSIGN_P,       // :    Assign pointer
@@ -26,6 +27,7 @@ enum class TokenType {
     PERIOD_DOUBLE,  // ..
     QUOTE_DOUBLE,   // "
     QUOTE_SINGLE,   // '
+    BACKTICK,       // `
 
 // Whitespace
     NEW_LINE,       // "\n"
@@ -44,16 +46,23 @@ enum class TokenType {
     OR_CONTROL,     // or ; else if / elif
     FOR,            // for
     WHILE,          // while
-    FOREVER,        // forever
+    FOREVER,        // forever ; while(true)
 
 // Keywords
-    FUNC,           // func
+    VAR_DEF,        // var
+    FUNC_DEF,       // func
     PROC,           // proc
     RETURN,         // return
     EXIT,           // exit
     ERROR,          // Error()
     ERROR_CRIT,     // CriticalError()
     OUT,            // Out() ; Print
+
+// Literals
+    DOUBLE,         // 123.45
+    STRING,         // " ... "
+    BOOL_LIT,       // true / false
+    NONE_LIT,       // none ; null
 
 // Boolean
     NOT,            // !
@@ -64,55 +73,13 @@ enum class TokenType {
     EOF             // End of file
 }
 
-class Token {
-    // Types
-    val NULL = "null"
+class Token(type: TokenType, value: Type, line: Int, column: Int) {
+    val type = type
+    val value = value
+    val line = line
+    val column = column
 
-    // Assignment
-    val ASSIGN_P = ":"
-    val ASSIGN_V = ":="
-
-    // Punctuation
-    val BRACE_L = "{"
-    val BRACE_R = "}"
-    val BRACK_L = "["
-    val BRACK_R = "]"
-    val PAREN_L = "("
-    val PAREN_R = ")"
-    val COMMA = ","
-    val SEMIOLON = ";"
-    val PERIOD = "."
-    val PERIOD_DOUBLE = ".."
-    val QUOTE_DOUBLE = "\""
-    val QUOTE_SINGLE = "'"
-
-    // Math
-    val ADD = "+"
-    val SUB = "-"
-    val MULT = "*"
-    val DIV = "/"
-    val MOD = "%"
-    val POW = "^"
-
-    // Control flow
-    val IF = "if"
-    val ELSE = "else"
-    val OR_CONTROL = "or"
-    val FOR = "for"
-    val WHILE = "while"
-    val FOREVER = "forever"
-
-    // Keywords
-    val FUNC = "func"
-    val PROC = "proc"
-    val RETURN = "return"
-    val EXIT = "exit"
-    val ERROR = "Error"
-    val ERROR_CRIT = "CriticalError"
-    val OUT = "Out"
-
-    // Boolean
-    val NOT = "!"
-    val OR = "||"
-    val AND = "&&"
+    override fun toString() : String {
+        return "Token of type: $type with value: {$value} at line: $line, column: $column"
+    }
 }
