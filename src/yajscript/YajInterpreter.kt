@@ -15,8 +15,10 @@ class YajInterpreter (source : String) {
 
     var encounteredError = false
 
+    lateinit var tokens : MutableList<Token>
+
     public final fun lex(): MutableList<Token> {
-        var tokens: MutableList<Token> = lexer.generateTokens(source)
+        var tokens: MutableList<Token> = lexer.lex(source)
 
         if (lexer.errors.size > 0) {
             encounteredError = true
@@ -29,7 +31,14 @@ class YajInterpreter (source : String) {
     }
 
     public final fun parse() {
+        var ast = parser.parse(tokens)
 
+        if (parser.errors.size > 0) {
+            encounteredError = true
+            for (error in parser.errors) {
+                error.print(::errorOut)
+            }
+        }
     }
 
     public final fun interpret() {
@@ -37,7 +46,7 @@ class YajInterpreter (source : String) {
     }
 
     public final fun run() : Boolean {
-        val tokens = lex()
+        tokens = lex()
         if (encounteredError) {
             return false
         }

@@ -77,7 +77,7 @@ class Lexer(interpreter: YajInterpreter) {
 
     fun stringEndOfLineError(offset : Int = 0) {
         errors.add(
-            Error("Unterminated string literal", getLine(), line, col + if (line == 0) 1 else -1)
+            Error("Unterminated string literal", getLine(), line, col + offset)
         )
     }
 
@@ -365,13 +365,26 @@ class Lexer(interpreter: YajInterpreter) {
         while (!curIs(endChar)) {
             if (peekIs('\n')) {
                 if (!multiLine) {
-                    stringEndOfLineError(0)
+                    stringEndOfLineError(
+                        if (line == 0)
+                            1
+                        else
+                            0
+                    )
                     break
                 } else {
                     newLine()
                 }
             } else if (atEnd()) {
-                stringEndOfLineError(0)
+                stringEndOfLineError(
+                // Equivalent to:
+//                    if (line == 0)
+//                        0
+//                    else
+//                        -1
+                // Assuming line is always positive
+                    (-line).coerceAtLeast(-1)
+                )
                 return
             }
 
@@ -484,13 +497,14 @@ class Lexer(interpreter: YajInterpreter) {
 
     /**
      * Generate tokens for entire input string
+     *
+     * @param source Source string to generate tokens for
      */
-    fun generateTokens(source: kotlin.String): MutableList<Token> {
+    fun lex(source: kotlin.String): MutableList<Token> {
         this.source = source
         reset()
 
         while (!atEnd()) {
-
             skipWhitespace()
             generateToken()
         }
