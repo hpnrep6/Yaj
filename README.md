@@ -1,6 +1,6 @@
 ## YajScript
 
-Abstract syntax tree interpreter for the Yaj programming language.
+Abstract syntax tree interpreter for the YajScript programming language.
 
 ## File structure
 
