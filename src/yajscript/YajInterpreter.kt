@@ -5,7 +5,7 @@ import yajscript.backend.Parser
 import yajscript.backend.Interpreter
 import yajscript.backend.Token
 
-class YajInterpreter (source : String) {
+open class YajInterpreter (source : String) {
     val source = source
     val digitSeparator = '.'
 
@@ -64,15 +64,15 @@ class YajInterpreter (source : String) {
         return true
     }
 
-    public fun out(message : String) {
+    public open fun out(message : String) {
         println(message)
     }
 
-    public fun errorOut(message : String) {
+    public open fun errorOut(message : String) {
         out(message)
     }
 
-    public fun hasEncounteredError() : Boolean {
+    public final fun hasEncounteredError() : Boolean {
         return encounteredError
     }
 }

@@ -1,5 +1,7 @@
 package yajscript.backend.ast
 
-open class Node {
+import yajscript.backend.ast.visitor.Visitor
 
+abstract class Node {
+    abstract fun visit(visitor : Visitor)
 }

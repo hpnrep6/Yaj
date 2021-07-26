@@ -1,4 +1,7 @@
-func yeet() {
-    var i: 0
-    var c: 3
+func test() {
+    var iii: 0
+    var cc: 3
+
+    var ge: "str"
+    var t:= g
 }

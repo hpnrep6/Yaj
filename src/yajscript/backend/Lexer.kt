@@ -378,10 +378,10 @@ class Lexer(interpreter: YajInterpreter) {
             } else if (atEnd()) {
                 stringEndOfLineError(
                 // Equivalent to:
-//                    if (line == 0)
-//                        0
-//                    else
-//                        -1
+//                 if (line == 0)
+//                     0
+//                 else
+//                     -1
                 // Assuming line is always positive
                     (-line).coerceAtLeast(-1)
                 )
@@ -481,6 +481,7 @@ class Lexer(interpreter: YajInterpreter) {
             ':' -> {
                 if (peekIs('=')) {
                     addToken(TokenType.ASSIGN_V)
+                    increment = 2
                 } else {
                     addToken(TokenType.ASSIGN_P)
                 }
