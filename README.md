@@ -2,6 +2,23 @@
 
 Abstract syntax tree interpreter for the YajScript programming language.
 
+## Grammar
+
+<scene>:
+
+<variable-declaration>:
+  
+<assign>:  
+  
+<expr>:
+  
+<number>:  
+  
+<add-sub>:
+  
+<mult_div>:  
+  
+
 ## File structure
 
 | Directory                     | Description |
