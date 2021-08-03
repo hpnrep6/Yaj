@@ -1,8 +1,6 @@
 package yajscript.backend.ast.visitor
 
-import yajscript.backend.ast.Binary
-import yajscript.backend.ast.Node
-import yajscript.backend.ast.Unary
+import yajscript.backend.ast.*
 
 class Execute : Visitor() {
 
@@ -14,13 +12,13 @@ class Execute : Visitor() {
     }
 
 
-    override fun visitVarDecl(node : Node) {
+    override fun visitVarDecl(node : DefVar) {
 
     }
-    override fun visitFuncDecl(node : Node) {
+    override fun visitFuncDecl(node : DefFunc) {
 
     }
-    override fun visitVarAssign(node : Node) {
+    override fun visitVarAssign(node : Assign) {
 
     }
     override fun visitFuncCall(node : Node) {

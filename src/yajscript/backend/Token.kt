@@ -8,7 +8,7 @@ enum class TokenType {
     BOOL,           // boolean value
 
 // Variables reference
-    INDENTIFIER,
+    IDENTIFIER,
 
 // Assignment
     ASSIGN_P,       // :    Assign pointer
@@ -22,7 +22,7 @@ enum class TokenType {
     PAREN_L,        // (
     PAREN_R,        // )
     COMMA,          // ,
-    SEMIOLON,       // ;
+    SEMICOLON,      // ;
     PERIOD,         // .
     PERIOD_DOUBLE,  // ..
     QUOTE_DOUBLE,   // "
@@ -66,11 +66,15 @@ enum class TokenType {
 
 // Boolean
     NOT,            // !
-    OR,             // ||
-    AND,            // &&
+    OR,             // |
+    AND,            // &
+    EQUALS,         // =
+    NOT_EQUALS,     // !=
 
 // Other
+    START_OF,       // Start of file
     EOF             // End of file
+
 }
 
 class Token(type: TokenType, value: Type, line: Int, column: Int) {

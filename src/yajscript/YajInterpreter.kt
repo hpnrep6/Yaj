@@ -1,9 +1,10 @@
 package yajscript
 
 import yajscript.backend.Lexer
-import yajscript.backend.Parser
+import yajscript.backend.parser.Parser
 import yajscript.backend.Interpreter
 import yajscript.backend.Token
+import yajscript.backend.ast.Node
 
 open class YajInterpreter (source : String) {
     val source = source
@@ -30,8 +31,8 @@ open class YajInterpreter (source : String) {
         return tokens
     }
 
-    public final fun parse() {
-        var ast = parser.parse(tokens)
+    public final fun parse(tokens: MutableList<Token>) : Node {
+        var ast = parser.parse(tokens, source)
 
         if (parser.errors.size > 0) {
             encounteredError = true
@@ -39,6 +40,8 @@ open class YajInterpreter (source : String) {
                 error.print(::errorOut)
             }
         }
+
+        return ast
     }
 
     public final fun interpret() {
@@ -51,7 +54,7 @@ open class YajInterpreter (source : String) {
             return false
         }
 
-        parse()
+        parse(tokens)
         if (encounteredError) {
             return false
         }

@@ -1,12 +1,18 @@
 package yajscript.backend.ast
 
 import yajscript.backend.ast.visitor.Visitor
+import kotlin.String
 
-class DefVar (target : Variable, value : Value) : Node() {
+class DefVar (target : Identifier, scope: Scope) : Var() {
     val left = target
-    val right = value
 
-    override fun visit(visitor : Visitor) {
+    override val scope = scope
 
+    override fun visit(visitor : Visitor): kotlin.String {
+        return ""
+    }
+
+    override fun toString(): String {
+        return "VarDef{$left}"
     }
 }

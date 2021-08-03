@@ -346,7 +346,7 @@ class Lexer(interpreter: YajInterpreter) {
             return
         }
 
-        addToken(TokenType.INDENTIFIER, Identifier(name), line, col - 1)
+        addToken(TokenType.IDENTIFIER, Identifier(name), line, col - 1)
     }
 
     /**
@@ -435,7 +435,7 @@ class Lexer(interpreter: YajInterpreter) {
             '(' -> addToken(TokenType.PAREN_L)
             ')' -> addToken(TokenType.PAREN_R)
             ',' -> addToken(TokenType.COMMA)
-            ';' -> addToken(TokenType.SEMIOLON)
+            ';' -> addToken(TokenType.SEMICOLON)
             '.' -> {
                 if (peekIs('.')) {
                     addToken(TokenType.PERIOD_DOUBLE)
@@ -459,23 +459,17 @@ class Lexer(interpreter: YajInterpreter) {
             '^' -> addToken(TokenType.POW)
 
             // Boolean
-            '!' -> addToken(TokenType.NOT)
-            '|' -> {
-                if (peekIs('|')) {
-                    addToken(TokenType.OR)
+            '!' -> {
+                if (peekIs('=')) {
+                    addToken(TokenType.NOT_EQUALS)
                     increment = 2
                 } else {
-                    unexpectedTokenError()
+                    addToken(TokenType.NOT)
                 }
             }
-            '&' -> {
-                if (peekIs('&')) {
-                    addToken(TokenType.AND)
-                    increment = 2
-                } else {
-                    unexpectedTokenError()
-                }
-            }
+            '|' -> addToken(TokenType.OR)
+            '&' -> addToken(TokenType.AND)
+            '=' -> addToken(TokenType.EQUALS)
 
             // Assign
             ':' -> {

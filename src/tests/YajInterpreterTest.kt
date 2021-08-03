@@ -29,40 +29,36 @@ internal class YajInterpreterTest {
 
         val tokens = interpreter.lex()
 
-//        for(token in tokens) {
-//            println(token)
-//        }
-
-        Assertions.assertEquals(false, interpreter.hasEncounteredError())
+        assertEquals(false, interpreter.hasEncounteredError())
     }
 
     val lexer_token_generation_content_expected = """
         Token of type: FUNC_DEF with value: {None} at line: 0, column: 3
-        Token of type: INDENTIFIER with value: {test} at line: 0, column: 8
+        Token of type: IDENTIFIER with value: {test} at line: 0, column: 8
         Token of type: PAREN_L with value: {None} at line: 0, column: 9
         Token of type: PAREN_R with value: {None} at line: 0, column: 10
         Token of type: BRACE_L with value: {None} at line: 0, column: 12
         Token of type: NEW_LINE with value: {None} at line: 0, column: 13
         Token of type: VAR_DEF with value: {None} at line: 1, column: 7
-        Token of type: INDENTIFIER with value: {iii} at line: 1, column: 11
+        Token of type: IDENTIFIER with value: {iii} at line: 1, column: 11
         Token of type: ASSIGN_P with value: {None} at line: 1, column: 12
         Token of type: DOUBLE with value: {0.0} at line: 1, column: 15
         Token of type: NEW_LINE with value: {None} at line: 1, column: 15
         Token of type: VAR_DEF with value: {None} at line: 2, column: 7
-        Token of type: INDENTIFIER with value: {cc} at line: 2, column: 10
+        Token of type: IDENTIFIER with value: {cc} at line: 2, column: 10
         Token of type: ASSIGN_P with value: {None} at line: 2, column: 11
         Token of type: DOUBLE with value: {3.0} at line: 2, column: 14
         Token of type: NEW_LINE with value: {None} at line: 2, column: 14
         Token of type: NEW_LINE with value: {None} at line: 3, column: 1
         Token of type: VAR_DEF with value: {None} at line: 4, column: 7
-        Token of type: INDENTIFIER with value: {ge} at line: 4, column: 10
+        Token of type: IDENTIFIER with value: {ge} at line: 4, column: 10
         Token of type: ASSIGN_P with value: {None} at line: 4, column: 11
         Token of type: STRING with value: {str} at line: 4, column: 17
         Token of type: NEW_LINE with value: {None} at line: 4, column: 18
         Token of type: VAR_DEF with value: {None} at line: 5, column: 7
-        Token of type: INDENTIFIER with value: {t} at line: 5, column: 9
+        Token of type: IDENTIFIER with value: {t} at line: 5, column: 9
         Token of type: ASSIGN_V with value: {None} at line: 5, column: 10
-        Token of type: INDENTIFIER with value: {g} at line: 5, column: 13
+        Token of type: IDENTIFIER with value: {g} at line: 5, column: 13
         Token of type: NEW_LINE with value: {None} at line: 5, column: 14
         Token of type: BRACE_R with value: {None} at line: 6, column: 1
     """.trimIndent().replace("\n", "")
@@ -80,7 +76,7 @@ internal class YajInterpreterTest {
             strb.append(token.toString())
         }
 
-        Assertions.assertEquals(lexer_token_generation_content_expected, strb.toString())
+        assertEquals(lexer_token_generation_content_expected, strb.toString())
     }
 
     val lexer_token_string_errors_expected = """
@@ -119,6 +115,18 @@ internal class YajInterpreterTest {
 
         interpreter.lex()
 
-        Assertions.assertEquals(lexer_token_string_errors_expected, interpreter.errors.toString())
+        assertEquals(lexer_token_string_errors_expected, interpreter.errors.toString())
+    }
+
+    @Test
+    fun parser_ast_generation() {
+        val string = readFile("parser_ast_generation.yaj")
+        val interpreter = YajInterpreter(string)
+
+        var tokens = interpreter.lex()
+
+        var node = interpreter.parse(tokens)
+        println(node)
+        assertEquals(1,1)
     }
 }

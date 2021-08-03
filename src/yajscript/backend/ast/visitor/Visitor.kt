@@ -1,17 +1,15 @@
 package yajscript.backend.ast.visitor
 
-import yajscript.backend.ast.Binary
-import yajscript.backend.ast.Node
-import yajscript.backend.ast.Unary
+import yajscript.backend.ast.*
 
 abstract class Visitor {
 
     abstract fun visitBinary(node : Binary)
     abstract fun visitUnary(node : Unary)
 
-    abstract fun visitVarDecl(node : Node)
-    abstract fun visitFuncDecl(node : Node)
-    abstract fun visitVarAssign(node : Node)
+    abstract fun visitVarDecl(node : DefVar)
+    abstract fun visitFuncDecl(node : DefFunc)
+    abstract fun visitVarAssign(node : Assign)
     abstract fun visitFuncCall(node : Node)
 
     abstract fun visitIf(node : Node)
