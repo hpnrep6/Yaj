@@ -102,7 +102,7 @@ class Parser(interpreter: YajInterpreter) {
         this.sourceSplit = sourceSplit
         reset()
 
-        val root = scene()
+        val root = expr(Scope())
 
         return root
     }
@@ -130,6 +130,12 @@ class Parser(interpreter: YajInterpreter) {
                     nodes.add(assign)
                 }
 
+                TokenType.OUT -> {
+                    ++index
+                    val out = out(scope) ?: continue
+
+                    nodes.add(out)
+                }
 
                 else -> {
                     error()
@@ -152,7 +158,7 @@ class Parser(interpreter: YajInterpreter) {
 
     fun getVar(scope: Scope): GetVar {
         return GetVar(
-            Identifier((tokens[index++].value as yajscript.backend.type.Identifier).value),
+            (tokens[index++].value as yajscript.backend.type.Identifier).value,
             scope
         )
     }
@@ -186,6 +192,30 @@ class Parser(interpreter: YajInterpreter) {
         } else {
             return Assign(variable, Number(0.0))
         }
+    }
+
+    fun out(scope: Scope): Print? {
+        consume(TokenType.PAREN_L) ?: return null
+
+        if (!atEnd()) {
+            var str : Node
+
+            when (tokens[index].type) {
+                TokenType.IDENTIFIER -> {
+                    str = getVar(scope)
+                }
+
+                else -> {
+                    str = String(tokens[index++].value)
+                }
+            }
+
+            consume(TokenType.PAREN_R) ?: return null
+
+            return Print(str)
+        }
+
+        return null
     }
 
     /**

@@ -10,6 +10,10 @@ class Bool(value: Boolean): Value() {
         TODO("Not yet implemented")
     }
 
+    override fun toPrint(): kotlin.String {
+        return value.toString()
+    }
+
     override fun toString(): String {
         return value.toString()
     }

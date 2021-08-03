@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import yajscript.YajInterpreter
+import yajscript.backend.ast.visitor.Execute
 import java.io.File
 import java.io.FileNotFoundException
 import kotlin.text.StringBuilder
@@ -127,6 +128,10 @@ internal class YajInterpreterTest {
 
         var node = interpreter.parse(tokens)
         println(node)
+
+        var exec = Execute()
+
+        println(node.visit(exec))
         assertEquals(1,1)
     }
 }

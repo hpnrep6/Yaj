@@ -4,9 +4,17 @@ import yajscript.backend.ast.visitor.Visitor
 import kotlin.String
 
 class Scope() {
-    val funcs = mapOf<kotlin.String, Scene>()
+    val funcs = mapOf<String, Scene>()
 
-    val vars = mapOf<kotlin.String, Node>()
+    val vars = mapOf<String, Node>()
+
+    fun getVar(name: String): Node? {
+        return vars.get(name)
+    }
+
+    fun getFunc(name: String): Node? {
+        return funcs.get(name)
+    }
 }
 
 class Scene(nodes: MutableList<Node>, scope: Scope): Node() {
