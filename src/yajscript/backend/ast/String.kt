@@ -11,8 +11,8 @@ class String (value : String): Value() {
 
     }
 
-    override fun visit(visitor : Visitor) {
-
+    override fun visit(visitor : Visitor): yajscript.backend.ast.String {
+        return visitor.visitString(this)
     }
 
     override fun toPrint(): kotlin.String {

@@ -4,16 +4,24 @@ import yajscript.backend.ast.visitor.Visitor
 import kotlin.String
 
 class Scope() {
-    val funcs = mapOf<String, Scene>()
+    val funcs = hashMapOf<String, Scene>()
 
-    val vars = mapOf<String, Node>()
+    val vars = hashMapOf<String, Node>()
 
-    fun getVar(name: String): Node? {
-        return vars.get(name)
+    fun addVar(name: String, value: Node) {
+        vars[name] = value
+    }
+
+    fun addFunc(name: String, value: Scene) {
+        vars[name] = value
+    }
+
+    fun getVar(name: String): Node {
+        return vars[name]!!
     }
 
     fun getFunc(name: String): Node? {
-        return funcs.get(name)
+        return funcs[name]!!
     }
 }
 
@@ -22,8 +30,8 @@ class Scene(nodes: MutableList<Node>, scope: Scope): Node() {
 
     val scope = scope
 
-    override fun visit(visitor: Visitor): Any? {
-        return null
+    override fun visit(visitor: Visitor): Node? {
+        return visitor.visitScene(this)
     }
 
     override fun toString(): String {
@@ -38,18 +46,20 @@ class Scene(nodes: MutableList<Node>, scope: Scope): Node() {
         }
 
         stringBuilder.append(")")
-//
-//        stringBuilder.append("Variables(\n")
-//
-//        stringBuilder.append(scope.funcs.toString())
-//
-//        stringBuilder.append(")\n")
-//
-//        stringBuilder.append("Functions(\n")
-//
-//        stringBuilder.append(scope.vars.toString())
-//
-//        stringBuilder.append(")\n)")
+
+        if (scope.funcs.isNotEmpty() || scope.vars.isNotEmpty()){
+            stringBuilder.append("\nVariables(\n")
+
+            stringBuilder.append(scope.vars.toString())
+
+            stringBuilder.append("\n)\n")
+
+            stringBuilder.append("Functions(\n")
+
+            stringBuilder.append(scope.funcs.toString())
+
+            stringBuilder.append("\n)")
+        }
 
         return stringBuilder.toString()
     }

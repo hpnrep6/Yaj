@@ -501,7 +501,10 @@ class Lexer(interpreter: YajInterpreter) {
 
         while (!atEnd()) {
             skipWhitespace()
-            generateToken()
+
+            // Check if whitespace skipped brings index to end
+            if (!atEnd())
+                generateToken()
         }
 
         return tokens

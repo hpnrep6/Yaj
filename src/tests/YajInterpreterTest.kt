@@ -131,7 +131,11 @@ internal class YajInterpreterTest {
 
         var exec = Execute()
 
-        println(node.visit(exec))
+        node.visit(exec)
+//
+        println(node)
+
+
         assertEquals(1,1)
     }
 }

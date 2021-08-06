@@ -6,6 +6,16 @@ import yajscript.backend.type.Double
 
 class Execute : Visitor() {
 
+    override fun visitScene(node: Scene): Node? {
+        var nodes = node.nodes
+
+        for (line in nodes) {
+            line.visit(this)
+        }
+
+        return null
+    }
+
     override fun visitBinary(node : Binary): Number {
         return node.operator(node.left.visit(this) as Number, node.right.visit(this) as Number)
     }
@@ -23,15 +33,50 @@ class Execute : Visitor() {
     }
 
 
-    override fun visitVarDef(node : DefVar) {
+    override fun visitStringConcat(node: StringConcat): yajscript.backend.ast.String {
 
+        return yajscript.backend.ast.String(
+            node.toPrint()
+        )
     }
+
+    override fun visitString(node: yajscript.backend.ast.String): yajscript.backend.ast.String {
+        return node
+    }
+
+
+    override fun visitVarDef(node : DefVar): String {
+        return node.name
+    }
+
+    override fun visitVarGet(node: GetVar): Node {
+        var scope = node.scope
+
+        return scope.getVar(node.name)
+    }
+
+    override fun visitAssign(node : Assign) {
+        var scope = node.left.scope
+        var name = node.left.visit(this)
+
+        var value = node.right.visit(this)
+
+        scope.addVar(name as String, value as Node)
+    }
+
+    override fun visitPointerAssign(node: PointerAssign) {
+        var scope = node.left.scope
+        var name = node.left.visit(this)
+
+        var value = node.right
+
+        scope.addVar(name as String, value)
+    }
+
     override fun visitFuncDef(node : DefFunc) {
 
     }
-    override fun visitVarAssign(node : Assign) {
 
-    }
     override fun visitFuncCall(node : Node) {
 
     }

@@ -7,12 +7,12 @@ class GetVar(name: String, scope: Scope): Var() {
     val name = name
     override val scope = scope
 
-    override fun visit(visitor: Visitor): String {
-        TODO("Not yet implemented")
+    override fun visit(visitor: Visitor): Node {
+        return visitor.visitVarGet(this)
     }
 
     override fun toPrint(): String {
-        var value = scope.getVar(name) ?: return ""
+        var value = scope.getVar(name)
 
         return value.toPrint()
     }

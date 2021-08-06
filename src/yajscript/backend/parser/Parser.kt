@@ -102,7 +102,7 @@ class Parser(interpreter: YajInterpreter) {
         this.sourceSplit = sourceSplit
         reset()
 
-        val root = expr(Scope())
+        val root = scene()
 
         return root
     }
@@ -123,11 +123,9 @@ class Parser(interpreter: YajInterpreter) {
                 }
 
                 TokenType.IDENTIFIER -> {
-                    val variable = getVar(scope)
+                    val node = varDef(scope) ?: continue
 
-                    val assign = assign(variable, scope) ?: continue
-
-                    nodes.add(assign)
+                    nodes.add(node)
                 }
 
                 TokenType.OUT -> {
@@ -151,7 +149,7 @@ class Parser(interpreter: YajInterpreter) {
     fun varDef(scope: Scope): Node? {
         val name = consume(TokenType.IDENTIFIER) ?: return null
 
-        val definition = DefVar(Identifier((name.value as yajscript.backend.type.Identifier).value), scope)
+        val definition = DefVar(((name.value as yajscript.backend.type.Identifier).value), scope)
 
         return assign(definition, scope)
     }
@@ -178,7 +176,7 @@ class Parser(interpreter: YajInterpreter) {
                 }
 
                 TokenType.STRING -> {
-                    return Assign(variable, string())
+                    return Assign(variable, stringConcat(scope))
                 }
 
                 TokenType.BOOL_LIT -> {
@@ -221,10 +219,44 @@ class Parser(interpreter: YajInterpreter) {
     /**
      * String
      */
-    fun string(): yajscript.backend.ast.String {
-        return String(
-            (tokens[index++].value as yajscript.backend.type.String).value
-        )
+    fun string(scope: Scope): Node? {
+        when (tokens[index].type) {
+            TokenType.STRING -> {
+                return String(
+                    (tokens[index++].value as yajscript.backend.type.String).value
+                )
+            }
+            TokenType.IDENTIFIER -> {
+                return getVar(scope)
+            }
+            else -> {
+                return null
+            }
+        }
+    }
+
+    fun stringConcat(scope: Scope): Node {
+        var root = string(scope)
+
+        if (root == null) {
+            error()
+            return String("")
+        }
+
+        if (curIs(TokenType.ADD, false)) {
+            ++index
+
+            if (!atEnd()) {
+                when (tokens[index].type) {
+                    TokenType.STRING,
+                    TokenType.IDENTIFIER -> {
+                        return StringConcat(root, stringConcat(scope))
+                    }
+                }
+            }
+        }
+
+        return root
     }
 
     /**
