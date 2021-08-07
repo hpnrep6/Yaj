@@ -1,5 +1,6 @@
-c := false
+c := 23
+d := 23
 
-b := (true = true) | (false = true)
+b := 2 > d
 
 Out(b)

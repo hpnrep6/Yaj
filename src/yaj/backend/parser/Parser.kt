@@ -8,6 +8,7 @@ import yaj.backend.ast.Node
 import yaj.backend.ast.*
 import yaj.backend.ast.Number
 import yaj.backend.type.Double
+import kotlin.test.currentStackTrace
 
 class Parser(interpreter: YajInterpreter) {
 
@@ -39,7 +40,7 @@ class Parser(interpreter: YajInterpreter) {
 
     fun error(offset: Int = 0, expected: TokenType? = null) {
         var exp = if (expected == null) "" else ". Expected $expected"
-//var a = currentStackTrace(); for (i in a) println(i.toString())
+var a = currentStackTrace(); for (i in a) println(i.toString())
 
         var token = tokens[index + offset]
         errors.add(
@@ -205,7 +206,17 @@ class Parser(interpreter: YajInterpreter) {
 
         // Get hinted type of operation based on token
         when (tokens[index + offset].type) {
-            TokenType.DOUBLE,
+            TokenType.DOUBLE -> {
+                var findOp = findOperation(variable, scope, offset + 1)
+                if (findOp == null) {
+                    return Assign(variable, expr(scope))
+                }
+
+                else {
+                    return findOp
+                }
+            }
+
             TokenType.ADD,
             TokenType.SUB,
             TokenType.MULT,
@@ -235,7 +246,6 @@ class Parser(interpreter: YajInterpreter) {
             }
 
             else -> {
-                error()
                 return null
             }
         }
@@ -344,6 +354,11 @@ class Parser(interpreter: YajInterpreter) {
                 return getVar(scope)
             }
 
+            TokenType.DOUBLE -> {
+                return expr(scope)
+            }
+
+
             else -> {
                 error()
                 ++index
@@ -439,7 +454,17 @@ class Parser(interpreter: YajInterpreter) {
                 TokenType.SUB,
                 TokenType.PAREN_R,
                 TokenType.NEW_LINE,
-                TokenType.SEMICOLON -> {
+                TokenType.SEMICOLON,
+
+                TokenType.NOT,
+                TokenType.OR,
+                TokenType.AND,
+                TokenType.EQUALS,
+                TokenType.NOT_EQUALS,
+                TokenType.GREATER_EQUALS,
+                TokenType.GREATER,
+                TokenType.LESS,
+                TokenType.LESS_EQUALS -> {
                     return root
                 }
 

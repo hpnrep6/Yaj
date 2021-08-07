@@ -10,6 +10,7 @@ class Execute(interpreter: YajInterpreter): Visitor() {
     /**
      * Scene
      */
+
     override fun visitScene(node: Scene): Node? {
         var nodes = node.nodes
 
@@ -20,9 +21,11 @@ class Execute(interpreter: YajInterpreter): Visitor() {
         return null
     }
 
+
     /**
      * Number
      */
+
     override fun visitBinary(node : Binary): Number {
         return node.operator(node.left.visit(this) as Number, node.right.visit(this) as Number)
     }
@@ -39,6 +42,7 @@ class Execute(interpreter: YajInterpreter): Visitor() {
     /**
      * String
      */
+
     override fun visitStringConcat(node: StringConcat): yaj.backend.ast.String {
 
         return yaj.backend.ast.String(
@@ -54,6 +58,7 @@ class Execute(interpreter: YajInterpreter): Visitor() {
     /**
      * Boolean
      */
+
     override fun visitBool(node: Bool): Bool {
         return node
     }
@@ -71,7 +76,8 @@ class Execute(interpreter: YajInterpreter): Visitor() {
     }
 
     override fun visitNumComparison(node: NumComparison): Bool {
-        return Bool(node.operator(node.left.visit(this) as Number, node.right.visit(this) as Number))
+        val value = node.operator(node.left.visit(this) as Number, node.right.visit(this) as Number)
+        return Bool(value)
     }
 
 
@@ -109,11 +115,17 @@ class Execute(interpreter: YajInterpreter): Visitor() {
     }
 
 
+    /**
+     * Output
+     */
     override fun visitPrint(node: Print) {
         interpreter.out((node.node.visit(this) as Node).toPrint())
     }
 
 
+    /**
+     * Function
+     */
     override fun visitFuncDef(node : DefFunc) {
 
     }
@@ -123,16 +135,25 @@ class Execute(interpreter: YajInterpreter): Visitor() {
     }
 
 
+    /**
+     * Conditional
+     */
     override fun visitIf(node : Node) {
 
     }
-    override fun visitElif(node : Node) {
+
+    override fun visitOr(node : Node) {
 
     }
+
     override fun visitElse(node : Node) {
 
     }
 
+
+    /**
+     * Loop
+     */
 
     override fun visitFor(node : Node) {
 

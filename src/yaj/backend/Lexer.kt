@@ -468,6 +468,22 @@ class Lexer(interpreter: YajInterpreter) {
             '|' -> addToken(TokenType.OR)
             '&' -> addToken(TokenType.AND)
             '=' -> addToken(TokenType.EQUALS)
+            '<' -> {
+                if (peekIs('=')) {
+                    addToken(TokenType.LESS_EQUALS)
+                    increment = 2
+                } else {
+                    addToken(TokenType.LESS)
+                }
+            }
+            '>' -> {
+                if (peekIs('=')) {
+                    addToken(TokenType.GREATER_EQUALS)
+                    increment = 2
+                } else {
+                    addToken(TokenType.GREATER)
+                }
+            }
 
             // Assign
             ':' -> {

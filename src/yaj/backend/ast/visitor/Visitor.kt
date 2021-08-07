@@ -30,9 +30,9 @@ abstract class Visitor {
     abstract fun visitFuncCall(node : Node): Any?
     abstract fun visitFuncDef(node : DefFunc): Unit
 
-    abstract fun visitIf(node : Node): Any?
-    abstract fun visitElif(node : Node): Any?
-    abstract fun visitElse(node : Node): Any?
+    abstract fun visitIf(node : Node): Unit
+    abstract fun visitOr(node : Node): Unit
+    abstract fun visitElse(node : Node): Unit
 
     abstract fun visitFor(node : Node): Any?
     abstract fun visitWhile(node : Node): Any?

@@ -17,6 +17,13 @@ class Number (value : Double) : Value() {
     override fun toString(): String {
         return value.toString()
     }
+
+    override fun compare(other: Node): Boolean {
+        if (other::class == this::class) {
+            return value == (other as Number).value
+        }
+        return false
+    }
 }
 
 fun formatNumber(num: Double): String {
