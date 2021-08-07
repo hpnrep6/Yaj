@@ -1,6 +1,6 @@
 c := 23
 d := 23
 
-b := 2 > d
+b := !!!!(false = false)
 
 Out(b)

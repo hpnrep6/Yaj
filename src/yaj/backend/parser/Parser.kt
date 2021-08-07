@@ -40,7 +40,7 @@ class Parser(interpreter: YajInterpreter) {
 
     fun error(offset: Int = 0, expected: TokenType? = null) {
         var exp = if (expected == null) "" else ". Expected $expected"
-var a = currentStackTrace(); for (i in a) println(i.toString())
+//var a = currentStackTrace(); for (i in a) println(i.toString())
 
         var token = tokens[index + offset]
         errors.add(
@@ -335,6 +335,7 @@ var a = currentStackTrace(); for (i in a) println(i.toString())
 
         when (tokens[index].type) {
             TokenType.NOT -> {
+                ++index
                 return Not(bool(scope))
             }
 
