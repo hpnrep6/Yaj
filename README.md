@@ -15,17 +15,29 @@ An AST interpreter for the Yaj programming language.
 - Expressions
   - Maths
   - Boolean
-     - Boolean operations
-     - Boolean comparisons
+    - Boolean operations
+    - Boolean comparisons
   - String concatenation
+  - Variable lookup
 - Variables
   - Variable initialisation
   - Variable assignment
 - Loops
   - While
+- Scope
+  - Variable shadowing
+  - Outer scope variable lookup
 - Output
   - Out (Defaults to kotlin's `println` function)
  
+#### TODO:
+- Counted loops
+- "Expression variable assignement"
+- Functions
+- Structs
+- Classes
+- Runtime error reporting
+
 ## Grammar
 
 \<scene>:
@@ -44,10 +56,12 @@ An AST interpreter for the Yaj programming language.
 
 ## File structure
 
-| Directory                     | Description |
-| ----------------------------- | ----------- |
-| `src/yaj/`              | placeholder |
-| `src/tests/`                  | placeholder |
-| `src/yaj/backend/`      | placeholder |
-| `src/yaj/backend/type`  | placeholder |
-| `src/yaj/backend/ast`   | placeholder |
+| Directory                      | Description                             |
+| ------------------------------ | --------------------------------------- |
+| `src/yaj/`                     | Interpreter files                       |
+| `src/tests/`                   | Interpreter tests                       |
+| `src/yaj/backend/`             | Core files                              |
+| `src/yaj/backend/type/`        | Token variable types                    |
+| `src/yaj/backend/ast/`         | Abstract syntax tree files              |
+| `src/yaj/backend/ast/visitor/` | Abstract syntax tree visitor            |
+| `src/yaj/backend/parse/r`      | Parser to generate abstract syntax tree |
