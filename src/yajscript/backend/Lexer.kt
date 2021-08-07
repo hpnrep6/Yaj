@@ -308,10 +308,10 @@ class Lexer(interpreter: YajInterpreter) {
     fun handleLiteral(word : kotlin.String) : Boolean {
         when (word) {
             "true" -> {
-                addToken(TokenType.BOOL_LIT, Bool(true), line, col - 1)
+                addToken(TokenType.BOOL, Bool(true), line, col - 1)
             }
             "false" -> {
-                addToken(TokenType.BOOL_LIT, Bool(false), line, col - 1)
+                addToken(TokenType.BOOL, Bool(false), line, col - 1)
             }
             "none" -> {
                 addToken(TokenType.NONE_LIT, None(), line, col - 1)

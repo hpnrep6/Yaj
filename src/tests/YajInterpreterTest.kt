@@ -119,22 +119,53 @@ internal class YajInterpreterTest {
         assertEquals(lexer_token_string_errors_expected, interpreter.errors.toString())
     }
 
+    val parser_ast_expr_expected = """
+        Scene(
+        Assign(VarDef{test}, Add(23.0, Positive(3.0)))
+        Assign(VarDef{d}, Add(Multiply(2.0, VarLookup{test}), Negative(5.0)))
+        Assign(VarDef{stringTest}, Concat("string", " test"))
+        Assign(VarDef{stringConcat}, Concat("stringtest is ", VarLookup{stringTest}))
+        Assign(VarDef{str}, "add the two! ->")
+        )
+        Variables(
+        str = "add the two! ->"
+        test = 26.0
+        d = 47.0
+        stringConcat = "stringtest is string test"
+        stringTest = "string test"
+        )
+        Functions(
+        )
+    """.trimIndent()
+
     @Test
-    fun parser_ast_generation() {
-        val string = readFile("parser_ast_generation.yaj")
+    fun parser_ast_expr() {
+        val string = readFile("parser_ast_expr.yaj")
         val interpreter = YajInterpreter(string)
 
         var tokens = interpreter.lex()
 
         var node = interpreter.parse(tokens)
-        println(node)
 
-        var exec = Execute()
+        var exec = Execute(interpreter)
 
         node.visit(exec)
-//
-        println(node)
 
+        assertEquals(parser_ast_expr_expected, node.toString())
+    }
+
+    @Test
+    fun interpreter_operations() {
+        val string = readFile("interpreter_operations.yaj")
+        val interpreter = YajInterpreter(string)
+
+        var tokens = interpreter.lex()
+
+        var node = interpreter.parse(tokens)
+println(node)
+        var exec = Execute(interpreter)
+
+        node.visit(exec)
 
         assertEquals(1,1)
     }

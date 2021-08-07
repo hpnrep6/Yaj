@@ -1,0 +1,5 @@
+c := false
+
+b := (true = true) | (false = true)
+
+Out(b)

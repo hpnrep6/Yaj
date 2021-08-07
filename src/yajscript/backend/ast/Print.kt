@@ -5,8 +5,8 @@ import yajscript.backend.ast.visitor.Visitor
 class Print(node: Node): Node() {
     val node = node
 
-    override fun visit(visitor: Visitor): Any? {
-        TODO("Not yet implemented")
+    override fun visit(visitor: Visitor): Unit {
+        return visitor.visitPrint(this)
     }
 
     override fun toString(): kotlin.String {

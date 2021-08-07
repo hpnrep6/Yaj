@@ -114,6 +114,9 @@ class Parser(interpreter: YajInterpreter) {
         do {
             skipWhitespace()
 
+            if (atEnd())
+                break
+
             when (tokens[index].type) {
                 TokenType.VAR_DEF -> {
                     ++index
@@ -133,6 +136,12 @@ class Parser(interpreter: YajInterpreter) {
                     val out = out(scope) ?: continue
 
                     nodes.add(out)
+                }
+
+                TokenType.IF -> {
+                    consume(TokenType.PAREN_L) ?: continue
+
+                    consume(TokenType.PAREN_R) ?: continue
                 }
 
                 else -> {
@@ -166,29 +175,71 @@ class Parser(interpreter: YajInterpreter) {
             consume(TokenType.ASSIGN_V) ?: return null
 
             when (tokens[index].type) {
-                TokenType.DOUBLE,
-                TokenType.IDENTIFIER,
-                TokenType.ADD,
-                TokenType.SUB -> {
-                    val evaluated = expr(scope)
-
-                    return Assign(variable, evaluated)
-                }
-
-                TokenType.STRING -> {
-                    return Assign(variable, stringConcat(scope))
-                }
-
-                TokenType.BOOL_LIT -> {
-                    return Assign(variable, bool())
+                TokenType.IDENTIFIER -> {
+                    if (!atEnd(1)) {
+                        return findOperation(variable, scope, 1)
+                    } else {
+                        return Assign(variable, Number(0.0))
+                    }
                 }
 
                 else -> {
-                    return null
+                    return findOperation(variable, scope)
                 }
             }
         } else {
             return Assign(variable, Number(0.0))
+        }
+    }
+
+    fun findOperation(variable: Var, scope: Scope, indexOffset: Int = 0): Node? {
+        var offset = indexOffset
+
+        // Skip tokens that give no hint to type of operation
+        while (!atEnd(offset)) {
+            if (tokens[index + offset].type == TokenType.PAREN_L ||
+                tokens[index + offset].type == TokenType.IDENTIFIER) {
+                ++offset
+            } else {
+                break
+            }
+        }
+
+        // Get hinted type of operation based on token
+        when (tokens[index + offset].type) {
+            TokenType.DOUBLE,
+            TokenType.ADD,
+            TokenType.SUB,
+            TokenType.MULT,
+            TokenType.DIV,
+            TokenType.POW,
+            TokenType.MOD -> {
+                val evaluated = expr(scope)
+
+                return Assign(variable, evaluated)
+            }
+
+            TokenType.STRING -> {
+                return Assign(variable, stringConcat(scope))
+            }
+
+            TokenType.BOOL,
+            TokenType.NOT,
+            TokenType.OR,
+            TokenType.AND,
+            TokenType.EQUALS,
+            TokenType.NOT_EQUALS,
+            TokenType.GREATER_EQUALS,
+            TokenType.GREATER,
+            TokenType.LESS,
+            TokenType.LESS_EQUALS -> {
+                return Assign(variable, boolExpr(scope))
+            }
+
+            else -> {
+                error()
+                return null
+            }
         }
     }
 
@@ -198,15 +249,7 @@ class Parser(interpreter: YajInterpreter) {
         if (!atEnd()) {
             var str : Node
 
-            when (tokens[index].type) {
-                TokenType.IDENTIFIER -> {
-                    str = getVar(scope)
-                }
-
-                else -> {
-                    str = String(tokens[index++].value)
-                }
-            }
+            str = stringConcat(scope)
 
             consume(TokenType.PAREN_R) ?: return null
 
@@ -219,6 +262,7 @@ class Parser(interpreter: YajInterpreter) {
     /**
      * String
      */
+
     fun string(scope: Scope): Node? {
         when (tokens[index].type) {
             TokenType.STRING -> {
@@ -226,10 +270,18 @@ class Parser(interpreter: YajInterpreter) {
                     (tokens[index++].value as yajscript.backend.type.String).value
                 )
             }
+
             TokenType.IDENTIFIER -> {
                 return getVar(scope)
             }
+
+            TokenType.DOUBLE -> {
+                return String(
+                    formatNumber((tokens[index++].value as Double).value)
+                )
+            }
             else -> {
+                error()
                 return null
             }
         }
@@ -249,28 +301,122 @@ class Parser(interpreter: YajInterpreter) {
             if (!atEnd()) {
                 when (tokens[index].type) {
                     TokenType.STRING,
-                    TokenType.IDENTIFIER -> {
+                    TokenType.IDENTIFIER,
+                    TokenType.DOUBLE -> {
                         return StringConcat(root, stringConcat(scope))
                     }
                 }
+            } else {
+                error(-1)
             }
         }
 
         return root
     }
 
+
     /**
      * Boolean
      */
-    fun bool(): Bool {
-        return Bool(
-            (tokens[index++].value as yajscript.backend.type.Bool).value
-        )
+
+    fun bool(scope: Scope): Node {
+        if (atEnd()) {
+            error(-1)
+            return Bool(false)
+        }
+
+        when (tokens[index].type) {
+            TokenType.NOT -> {
+                return Not(bool(scope))
+            }
+
+            TokenType.BOOL -> {
+                return Bool((tokens[index++].value as yajscript.backend.type.Bool).value)
+            }
+
+            TokenType.PAREN_L -> {
+                ++index
+                var node = boolExpr(scope)
+                consume(TokenType.PAREN_R) ?: return Bool(false)
+
+                return node
+            }
+
+            TokenType.IDENTIFIER -> {
+                return getVar(scope)
+            }
+
+            else -> {
+                error()
+                ++index
+                return Bool(false)
+            }
+        }
+    }
+
+    fun boolExpr(scope: Scope): Node {
+        val root = bool(scope)
+
+        if (!atEnd())
+            when (tokens[index].type) {
+                TokenType.OR -> {
+                    ++index
+                    return Or(root, boolExpr(scope))
+                }
+
+                TokenType.AND -> {
+                    ++index
+                    return And(root, boolExpr(scope))
+                }
+
+                TokenType.PAREN_R,
+                TokenType.NEW_LINE,
+                TokenType.SEMICOLON -> {
+                    return root
+                }
+
+                TokenType.EQUALS -> {
+                    ++index
+                    return Equals(root, boolExpr(scope))
+                }
+
+                TokenType.NOT_EQUALS -> {
+                    ++index
+                    return NotEquals(root, boolExpr(scope))
+                }
+
+                TokenType.GREATER_EQUALS -> {
+                    ++index
+                    return GreaterEquals(root, boolExpr(scope))
+                }
+
+                TokenType.LESS_EQUALS -> {
+                    ++index
+                    return LessEquals(root, boolExpr(scope))
+                }
+
+                TokenType.LESS -> {
+                    ++index
+                    return Less(root, boolExpr(scope))
+                }
+
+                TokenType.GREATER -> {
+                    ++index
+                    return Greater(root, boolExpr(scope))
+                }
+
+                else -> {
+                    error()
+                }
+            }
+
+        return root
     }
 
     /**
-     * Math
+     * Number
      */
+
     fun mult_div(scope: Scope) : Node {
         var root = num(scope)
 

@@ -6,8 +6,8 @@ import kotlin.String
 class Bool(value: Boolean): Value() {
     override val value = value
 
-    override fun visit(visitor: Visitor): Boolean {
-        TODO("Not yet implemented")
+    override fun visit(visitor: Visitor): Bool {
+        return visitor.visitBool(this)
     }
 
     override fun toPrint(): kotlin.String {

@@ -9,4 +9,8 @@ abstract class Node {
     open fun toPrint(): String {
         return this::class.toString()
     }
+
+    open fun compare(other: Node): Boolean {
+        return other == this
+    }
 }

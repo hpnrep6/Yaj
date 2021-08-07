@@ -5,7 +5,6 @@ import yajscript.backend.type.Type
 enum class TokenType {
 // Variable types
     NULL,           // null value
-    BOOL,           // boolean value
 
 // Variables reference
     IDENTIFIER,
@@ -61,20 +60,24 @@ enum class TokenType {
 // Literals
     DOUBLE,         // 123.45
     STRING,         // " ... "
-    BOOL_LIT,       // true / false
+    BOOL,           // true / false
     NONE_LIT,       // none ; null
 
 // Boolean
     NOT,            // !
     OR,             // |
     AND,            // &
+    // Comparison
     EQUALS,         // =
     NOT_EQUALS,     // !=
+    GREATER_EQUALS, // >=
+    LESS_EQUALS,    // <=
+    LESS,           // <
+    GREATER,        // >
 
 // Other
     START_OF,       // Start of file
     EOF             // End of file
-
 }
 
 class Token(type: TokenType, value: Type, line: Int, column: Int) {

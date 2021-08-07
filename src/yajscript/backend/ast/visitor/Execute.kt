@@ -1,11 +1,16 @@
 package yajscript.backend.ast.visitor
 
+import yajscript.YajInterpreter
 import yajscript.backend.ast.*
 import yajscript.backend.ast.Number
 import yajscript.backend.type.Double
 
-class Execute : Visitor() {
+class Execute(interpreter: YajInterpreter): Visitor() {
+    val interpreter = interpreter
 
+    /**
+     * Scene
+     */
     override fun visitScene(node: Scene): Node? {
         var nodes = node.nodes
 
@@ -16,6 +21,9 @@ class Execute : Visitor() {
         return null
     }
 
+    /**
+     * Number
+     */
     override fun visitBinary(node : Binary): Number {
         return node.operator(node.left.visit(this) as Number, node.right.visit(this) as Number)
     }
@@ -28,11 +36,10 @@ class Execute : Visitor() {
         return node
     }
 
-    override fun visitNumVariable(node: Var): Number {
-        TODO("Not yet implemented")
-    }
 
-
+    /**
+     * String
+     */
     override fun visitStringConcat(node: StringConcat): yajscript.backend.ast.String {
 
         return yajscript.backend.ast.String(
@@ -44,6 +51,34 @@ class Execute : Visitor() {
         return node
     }
 
+
+    /**
+     * Boolean
+     */
+    override fun visitBool(node: Bool): Bool {
+        return node
+    }
+
+    override fun visitBoolBinary(node: BoolBinary): Bool {
+        return node.operator(node.left.visit(this) as Bool, node.right.visit(this) as Bool)
+    }
+
+    override fun visitBoolUnary(node: BoolUnary): Bool {
+        return node.operator(node.left.visit(this) as Bool)
+    }
+
+    override fun visitBoolComparison(node: BoolComparison): Bool {
+        return Bool((node.left.visit(this) as Node).compare(node.right.visit(this) as Node))
+    }
+
+    override fun visitNumComparison(node: NumComparison): Bool {
+        return Bool(node.operator(node.left.visit(this) as Number, node.right.visit(this) as Number))
+    }
+
+
+    /**
+     * Assignment
+     */
 
     override fun visitVarDef(node : DefVar): String {
         return node.name
@@ -68,10 +103,17 @@ class Execute : Visitor() {
         var scope = node.left.scope
         var name = node.left.visit(this)
 
+        // Similar to assign, but do not precalculate the value
         var value = node.right
 
         scope.addVar(name as String, value)
     }
+
+
+    override fun visitPrint(node: Print) {
+        interpreter.out((node.node.visit(this) as Node).toPrint())
+    }
+
 
     override fun visitFuncDef(node : DefFunc) {
 

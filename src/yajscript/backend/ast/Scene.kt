@@ -48,19 +48,29 @@ class Scene(nodes: MutableList<Node>, scope: Scope): Node() {
         stringBuilder.append(")")
 
         if (scope.funcs.isNotEmpty() || scope.vars.isNotEmpty()){
-            stringBuilder.append("\nVariables(\n")
+            stringBuilder.append("\nVariables(")
 
-            stringBuilder.append(scope.vars.toString())
+            stringBuilder.append(hashMapToString(scope.vars))
 
             stringBuilder.append("\n)\n")
 
-            stringBuilder.append("Functions(\n")
+            stringBuilder.append("Functions(")
 
-            stringBuilder.append(scope.funcs.toString())
+            stringBuilder.append(hashMapToString(scope.funcs))
 
             stringBuilder.append("\n)")
         }
 
         return stringBuilder.toString()
     }
+}
+
+private fun <K, T> hashMapToString(hashmap: HashMap<K, T>): String {
+    var string = StringBuilder()
+
+    for ((key, value) in hashmap) {
+        string.append("\n$key = $value")
+    }
+
+    return string.toString()
 }
