@@ -1,22 +1,6 @@
 ## Yaj
 
 An AST interpreter for the Yaj programming language.
-
-## Grammar
-
-\<scene>:
-
-\<variable-declaration>:
-  
-\<assign>:  
-  
-\<expr>:
-  
-\<number>:  
-  
-\<add-sub>:
-  
-\<mult_div>:  
   
 ## Features
  
@@ -34,6 +18,22 @@ An AST interpreter for the Yaj programming language.
   - String concatenation
 - Output
   - Out (Defaults to kotlin's `println` function)
+ 
+## Grammar
+
+\<scene>:
+
+\<variable-declaration>:
+  
+\<assign>:  
+  
+\<expr>:
+  
+\<number>:  
+  
+\<add-sub>:
+  
+\<mult_div>:  
 
 ## File structure
 
