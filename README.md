@@ -15,8 +15,8 @@ An AST interpreter for the Yaj programming language.
 - Expressions
   - Maths
   - Boolean
-   - Boolean operations
-   - Boolean comparisons
+     - Boolean operations
+     - Boolean comparisons
   - String concatenation
 - Variables
   - Variable initialisation
