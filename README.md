@@ -23,8 +23,8 @@ Abstract syntax tree interpreter for the YajScript programming language.
 
 | Directory                     | Description |
 | ----------------------------- | ----------- |
-| `src/yajscript/`              | placeholder |
+| `src/yaj/`              | placeholder |
 | `src/tests/`                  | placeholder |
-| `src/yajscript/backend/`      | placeholder |
-| `src/yajscript/backend/type`  | placeholder |
-| `src/yajscript/backend/ast`   | placeholder |
+| `src/yaj/backend/`      | placeholder |
+| `src/yaj/backend/type`  | placeholder |
+| `src/yaj/backend/ast`   | placeholder |

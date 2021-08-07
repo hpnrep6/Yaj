@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/YajScript.iml" filepath="$PROJECT_DIR$/YajScript.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Yaj.iml" filepath="$PROJECT_DIR$/Yaj.iml" />
     </modules>
   </component>
 </project>

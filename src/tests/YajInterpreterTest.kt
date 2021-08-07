@@ -1,10 +1,9 @@
 package tests
 
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import yajscript.YajInterpreter
-import yajscript.backend.ast.visitor.Execute
+import yaj.YajInterpreter
+import yaj.backend.ast.visitor.Execute
 import java.io.File
 import java.io.FileNotFoundException
 import kotlin.text.StringBuilder
