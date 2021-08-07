@@ -18,6 +18,22 @@ An AST interpreter for the Yaj programming language.
   
 \<mult_div>:  
   
+## Features
+ 
+- Types
+  - Number (Double-precision floating point)
+  - String
+  - Bool (Boolean)
+- Control structures
+  - If
+  - Else
+  - Or (Syntaxic sugar for `else if`)
+- Expressions
+  - Mathematical
+  - Boolean
+  - String concatenation
+- Output
+  - Out (Defaults to kotlin's `println` function)
 
 ## File structure
 
