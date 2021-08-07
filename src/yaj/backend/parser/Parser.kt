@@ -106,9 +106,17 @@ class Parser(interpreter: YajInterpreter) {
         return root
     }
 
-    fun scene(): Scene {
+    fun scene(parent: Scope? = null): Scene {
         val nodes = mutableListOf<Node>()
-        val scope = Scope()
+        val scope = Scope(parent)
+
+        if (atEnd())
+            return Scene(nodes, scope)
+
+        if (tokens[index].type == TokenType.BRACE_L ||
+            tokens[index].type == TokenType.START_OF) {
+            ++index
+        }
 
         do {
             skipWhitespace()
@@ -138,9 +146,30 @@ class Parser(interpreter: YajInterpreter) {
                 }
 
                 TokenType.IF -> {
+                    ++index
                     consume(TokenType.PAREN_L) ?: continue
 
+                    val boolExpr = boolExpr(scope)
+
                     consume(TokenType.PAREN_R) ?: continue
+
+                    val scene = scene(scope)
+
+                    var otherwise: Scene? = null
+
+                    if (tokenIs(TokenType.ELSE, 0, false)) {
+                        consume(TokenType.ELSE)
+
+                        otherwise = scene(scope)
+                    }
+
+                    nodes.add(If(boolExpr, scene, otherwise))
+                }
+
+                TokenType.EOF,
+                TokenType.BRACE_R -> {
+                    ++index
+                    break
                 }
 
                 else -> {
@@ -175,8 +204,8 @@ class Parser(interpreter: YajInterpreter) {
 
             when (tokens[index].type) {
                 TokenType.IDENTIFIER -> {
-                    if (!atEnd(1)) {
-                        return findOperation(variable, scope, 1)
+                    if (!atEnd()) {
+                        return findOperation(variable, scope)
                     } else {
                         return Assign(variable, Number(0.0))
                     }
@@ -196,8 +225,7 @@ class Parser(interpreter: YajInterpreter) {
 
         // Skip tokens that give no hint to type of operation
         while (!atEnd(offset)) {
-            if (tokens[index + offset].type == TokenType.PAREN_L ||
-                tokens[index + offset].type == TokenType.IDENTIFIER) {
+            if (tokens[index + offset].type == TokenType.PAREN_L) {
                 ++offset
             } else {
                 break
@@ -208,10 +236,21 @@ class Parser(interpreter: YajInterpreter) {
         when (tokens[index + offset].type) {
             TokenType.DOUBLE -> {
                 var findOp = findOperation(variable, scope, offset + 1)
+
                 if (findOp == null) {
                     return Assign(variable, expr(scope))
                 }
+                else {
+                    return findOp
+                }
+            }
 
+            TokenType.IDENTIFIER -> {
+                var findOp = findOperation(variable, scope, offset + 1)
+
+                if (findOp == null) {
+                    return Assign(variable, getVar(scope))
+                }
                 else {
                     return findOp
                 }

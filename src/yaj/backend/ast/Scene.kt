@@ -3,10 +3,23 @@ package yaj.backend.ast
 import yaj.backend.ast.visitor.Visitor
 import kotlin.String
 
-class Scope() {
+class Scope(parent: Scope?) {
+    val parent = parent
+
     val funcs = hashMapOf<String, Scene>()
 
     val vars = hashMapOf<String, Node>()
+
+    var nestedLevel: Int = 0
+
+    init {
+        var parent = parent
+
+        while (parent != null) {
+            parent = parent.parent
+            ++nestedLevel
+        }
+    }
 
     fun addVar(name: String, value: Node) {
         vars[name] = value
@@ -17,7 +30,17 @@ class Scope() {
     }
 
     fun getVar(name: String): Node {
-        return vars[name]!!
+        val attempt = vars[name]
+
+        if (parent == null) {
+            return attempt!!
+        }
+
+        if (attempt == null) {
+            return parent.getVar(name)
+        }
+
+        return attempt
     }
 
     fun getFunc(name: String): Node? {
@@ -37,28 +60,44 @@ class Scene(nodes: MutableList<Node>, scope: Scope): Node() {
     override fun toString(): String {
         var stringBuilder = StringBuilder()
 
+        var indent = StringBuilder()
+
+        for (i in 1..scope.nestedLevel) {
+            indent.append("    ")
+        }
+
+        var indentStr = indent.toString()
+
+        stringBuilder.append(indentStr)
+
         stringBuilder.append("Scene(\n")
 
         for (node in nodes) {
+            stringBuilder.append(indentStr)
             stringBuilder.append(node.toString())
 
             stringBuilder.append("\n")
         }
-
+        stringBuilder.append(indentStr)
         stringBuilder.append(")")
 
-        if (scope.funcs.isNotEmpty() || scope.vars.isNotEmpty()){
-            stringBuilder.append("\nVariables(")
 
+        if (scope.funcs.isNotEmpty() || scope.vars.isNotEmpty()){
+            stringBuilder.append("\n${indentStr}Variables(")
+
+            stringBuilder.append(indentStr)
             stringBuilder.append(hashMapToString(scope.vars))
 
+            stringBuilder.append(indentStr)
             stringBuilder.append("\n)\n")
 
+            stringBuilder.append(indentStr)
             stringBuilder.append("Functions(")
 
+            stringBuilder.append(indentStr)
             stringBuilder.append(hashMapToString(scope.funcs))
 
-            stringBuilder.append("\n)")
+            stringBuilder.append("\n$indentStr)")
         }
 
         return stringBuilder.toString()

@@ -22,7 +22,6 @@ fun initialistKeywords() : HashMap<kotlin.String, TokenType> {
 
     keywordMap.put("if", TokenType.IF)
     keywordMap.put("else", TokenType.ELSE)
-    keywordMap.put("or", TokenType.OR_CONTROL)
     keywordMap.put("for", TokenType.FOR)
     keywordMap.put("while", TokenType.WHILE)
     keywordMap.put("forever", TokenType.FOREVER)
@@ -314,6 +313,10 @@ class Lexer(interpreter: YajInterpreter) {
             "none" -> {
                 addToken(TokenType.NONE_LIT, None(), line, col - 1)
             }
+            "or" -> {
+                addToken(TokenType.ELSE)
+                addToken(TokenType.IF)
+            }
             else -> {
                 return false
             }
@@ -513,6 +516,8 @@ class Lexer(interpreter: YajInterpreter) {
         this.source = source
         reset()
 
+        addToken(TokenType.START_OF)
+
         while (!atEnd()) {
             skipWhitespace()
 
@@ -520,6 +525,9 @@ class Lexer(interpreter: YajInterpreter) {
             if (!atEnd())
                 generateToken()
         }
+
+        addToken(TokenType.NEW_LINE)
+        addToken(TokenType.EOF)
 
         return tokens
     }

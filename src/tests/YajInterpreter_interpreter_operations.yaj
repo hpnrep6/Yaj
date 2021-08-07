@@ -1,6 +1,8 @@
-c := 23
-d := 23
-
-b := !!!!(false = false)
-
-Out(b)
+if (false = true) {
+    a := 23
+    Out(a)
+} else if (true) {
+    Out("asdd")
+} or (true) {
+    c := 231
+}

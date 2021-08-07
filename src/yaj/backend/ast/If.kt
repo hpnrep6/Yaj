@@ -3,15 +3,19 @@ package yaj.backend.ast
 import yaj.backend.ast.visitor.Visitor
 import kotlin.String
 
-class If(booleanOperation: Node, scene: Scene): Node() {
+class If(booleanOperation: Node, scene: Scene, otherwise: Scene? = null): Node() {
     val operation = booleanOperation
     val scene = scene
+    val otherwise = otherwise // else, but that's a reserved keyword in kotlin
 
     override fun visit(visitor: Visitor): Unit {
         return visitor.visitIf(this)
     }
 
     override fun toString(): String {
-        return "Conditional($operation,\n$scene)"
+        if (otherwise == null)
+            return "If($operation,\n$scene)"
+        else
+            return "If($operation,\n$scene,\nElse(\n$otherwise)"
     }
 }

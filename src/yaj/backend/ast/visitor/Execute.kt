@@ -138,16 +138,14 @@ class Execute(interpreter: YajInterpreter): Visitor() {
     /**
      * Conditional
      */
-    override fun visitIf(node : Node) {
+    override fun visitIf(node : If) {
+        val bool = node.operation.visit(this) as Bool
 
-    }
-
-    override fun visitOr(node : Node) {
-
-    }
-
-    override fun visitElse(node : Node) {
-
+        if (bool.value) {
+            node.scene.visit(this)
+        } else if (node.otherwise != null) {
+            node.otherwise.visit(this)
+        }
     }
 
 
