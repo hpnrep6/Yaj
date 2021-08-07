@@ -5,17 +5,24 @@ An AST interpreter for the Yaj programming language.
 ## Features
  
 - Types
-  - Number (Double-precision floating point)
-  - String
-  - Bool (Boolean)
+  - Number (Kotlin double-precision floating point)
+  - String (Kotlin strings)
+  - Bool (Kotlin boolean)
 - Control structures
   - If
   - Else
-  - Or (Syntaxic sugar for `else if`)
+  - Or (Syntactic sugar for `else if`)
 - Expressions
-  - Mathematical
+  - Maths
   - Boolean
+   - Boolean operations
+   - Boolean comparisons
   - String concatenation
+- Variables
+  - Variable initialisation
+  - Variable assignment
+- Loops
+  - While
 - Output
   - Out (Defaults to kotlin's `println` function)
  
