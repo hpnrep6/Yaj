@@ -1,6 +1,6 @@
-## YajScript
+## Yaj
 
-Abstract syntax tree interpreter for the YajScript programming language.
+An AST interpreter for the Yaj programming language.
 
 ## Grammar
 
