@@ -97,11 +97,24 @@ class Execute(interpreter: YajInterpreter): Visitor() {
 
     override fun visitAssign(node : Assign) {
         var scope = node.left.scope
-        var name = node.left.visit(this)
-
         var value = node.right.visit(this)
 
-        scope.addVar(name as String, value as Node)
+        if (node.left::class == DefVar::class) {
+            val name = node.left.visit(this)
+            val nameString = name as String
+
+            scope.addVar(nameString, value as Node)
+
+        } else {
+            val nameString = (node.left as GetVar).name
+
+            var varScope = scope.getVarScope(nameString)
+            if (varScope == null) {
+                return
+            } else {
+                varScope.addVar(nameString, value as Node)
+            }
+        }
     }
 
     override fun visitPointerAssign(node: PointerAssign) {
@@ -156,7 +169,17 @@ class Execute(interpreter: YajInterpreter): Visitor() {
     override fun visitFor(node : Node) {
 
     }
-    override fun visitWhile(node : Node) {
 
+    override fun visitWhile(node : While) {
+        val boolExpr = node.condition
+        val scene = node.scene
+var a = 0
+        while (
+            (boolExpr.visit(this) as Bool).value
+        ) {
+            scene.visit(this)
+            a++
+            if (a > 20) break
+        }
     }
 }

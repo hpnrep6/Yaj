@@ -43,8 +43,39 @@ class Scope(parent: Scope?) {
         return attempt
     }
 
+    fun getVarScope(name: String): Scope? {
+        val attempt = vars[name]
+
+        if (attempt != null) {
+            return this
+        }
+
+        if (parent == null) {
+            return null
+        }
+
+        var parent = parent
+
+        while (true) {
+            if (parent == null) {
+                return null
+            }
+
+            var testParent = parent.vars[name]
+
+            if (testParent != null) {
+                return parent
+            }
+            parent = parent.parent
+        }
+    }
+
     fun getFunc(name: String): Node? {
         return funcs[name]!!
+    }
+
+    override fun toString(): String {
+        return "Scope(\n$vars,\n$funcs)"
     }
 }
 

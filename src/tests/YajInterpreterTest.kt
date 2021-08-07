@@ -161,7 +161,7 @@ internal class YajInterpreterTest {
         var tokens = interpreter.lex()
 
         var node = interpreter.parse(tokens)
-//println(node)
+
         var exec = Execute(interpreter)
 
         node.visit(exec)

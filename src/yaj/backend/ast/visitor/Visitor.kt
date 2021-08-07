@@ -32,6 +32,6 @@ abstract class Visitor {
 
     abstract fun visitIf(node : If): Unit
 
-    abstract fun visitFor(node : Node): Any?
-    abstract fun visitWhile(node : Node): Any?
+    abstract fun visitFor(node : Node): Unit
+    abstract fun visitWhile(node : While): Unit
 }

@@ -133,7 +133,7 @@ class Parser(interpreter: YajInterpreter) {
                 }
 
                 TokenType.IDENTIFIER -> {
-                    val node = varDef(scope) ?: continue
+                    val node = varGet(scope) ?: continue
 
                     nodes.add(node)
                 }
@@ -166,6 +166,19 @@ class Parser(interpreter: YajInterpreter) {
                     nodes.add(If(boolExpr, scene, otherwise))
                 }
 
+                TokenType.WHILE -> {
+                    ++index
+                    consume(TokenType.PAREN_L) ?: continue
+
+                    val boolExpr = boolExpr(scope)
+
+                    consume(TokenType.PAREN_R) ?: continue
+
+                    val scene = scene(scope)
+
+                    nodes.add(While(boolExpr, scene))
+                }
+
                 TokenType.EOF,
                 TokenType.BRACE_R -> {
                     ++index
@@ -189,6 +202,12 @@ class Parser(interpreter: YajInterpreter) {
         val definition = DefVar(((name.value as yaj.backend.type.Identifier).value), scope)
 
         return assign(definition, scope)
+    }
+
+    fun varGet(scope: Scope): Node? {
+        val variable = getVar(scope)
+
+        return assign(variable, scope)
     }
 
     fun getVar(scope: Scope): GetVar {
