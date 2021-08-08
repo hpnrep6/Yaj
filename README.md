@@ -92,7 +92,7 @@ while_loop = "while", "(", boolExpr, ")", "{", scene ;
 
 scene = [{var_decl | assign | out | if_statement | while_loop}], ("}" | ? EOF ? ) ;
 
-program = scene
+program = scene ;
 ```
 
 ## File structure
