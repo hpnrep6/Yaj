@@ -32,14 +32,6 @@ An AST interpreter for the Yaj programming language.
   - Outer scope variable lookup
 - Output
   - Out (Defaults to kotlin's `println` function)
- 
-#### TODO:
-- Counted loops
-- "Expression variable assignement"
-- Functions
-- Structs
-- Classes
-- Runtime error reporting
 
 ## Extended Backus-Naur form Grammar
 ```
