@@ -27,20 +27,39 @@ An AST interpreter for the Yaj programming language.
 - Procedures
   - Procedure initialisation
   - Procedure calls
+  - Procedure return values
+- Functions
+  - Function initilisation
+  - Function parameters
+  - Function calls
+  - Function return values
 - Scope
   - Variable shadowing
   - Outer scope variable lookup
 - Output
   - Out (Defaults to kotlin's `println` function)
 
+#### Todo
+- Support recursion (currently scopes are reused)
+- For loop syntactic sugar
+- Runtime error reporting (currently only reports errors in the lexer and parser stages)
+
 ## Example
 ```
-var a := 2;
-var b := 3;
+var example := 25;
 
-Out(a + b)
+func test(variable) {
+    example := variable * 4 + example
+    if (example > 200) {
+        Out(example + " is the value of test")
+    }
+}
 
-Out(a * 10);
+var i := 0
+while (i <= 10) {
+    test(i + 20)
+    i := i + 1
+}
 ```
 
 ## Extended Backus-Naur form Grammar
@@ -73,7 +92,7 @@ assign = identifier, ":=", operation ;
 
 var_decl = "var", assign ;
 
-num = ( number | identifier | ("(", expr, ")") ) | ( ( "+" | "-" ), num ) ;
+num = ( number | identifier | function_call | ("(", expr, ")") ) | ( ( "+" | "-" ), num ) ;
 
 add_sub = num, [ ("+" | "-"), mult_div] ;
   
@@ -85,13 +104,13 @@ bool = "true" | "false" ;
 
 comparison = "=" | ">" | ">=" | "<" | "<=" ;
 
-bool_op_unary = ("!", bool) | bool ;
+bool_op_unary = ["!"], bool | function_call | identifier | bool_op_unary ;
 
 bool_op_bin = bool, ("&" | "|"), bool_op_unary ;
 
 boolExpr = bool_op_unary, [{bool_op_bin}] ;
 
-stringConcat = (string | identifier | number), ["+", stringConcat] ;
+stringConcat = (string | identifier | number | function_call), ["+", stringConcat] ;
 
 out = "Out", "(", stringConcat, ")" ;
 
@@ -108,6 +127,8 @@ procedure_call = identifier, "(", ")" ;
 function_decl = "func", identifier, "(", identifier, { ",", identifier } , ")", "{", scene ;
 
 function_call = identifier, "(", operation, [{ ",", operation }], ")" ;
+
+return = "return", "(", operation, ")" ;
 
 scene = [{(
     var_decl | 
