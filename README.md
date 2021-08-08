@@ -45,13 +45,15 @@ An AST interpreter for the Yaj programming language (with very unoriginal syntax
 - Runtime error reporting (currently only reports errors in the lexer and parser stages)
 
 ## Example
+
+### Input
 ```
 var example := 25;
 
 func test(variable) {
     example := variable * 4 + example
     if (example > 200) {
-        Out(example + " is the value of test")
+        Out(example + " is the value of example")
     }
 }
 
@@ -60,6 +62,19 @@ while (i <= 10) {
     test(i + 20)
     i := i + 1
 }
+```
+
+### Output
+```
+277 is the value of example
+369 is the value of example
+465 is the value of example
+565 is the value of example
+669 is the value of example
+777 is the value of example
+889 is the value of example
+1005 is the value of example
+1125 is the value of example
 ```
 
 ## Extended Backus-Naur form Grammar
