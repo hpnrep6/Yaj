@@ -1,6 +1,6 @@
 ## Yaj Interpreter
 
-An AST interpreter for the Yaj programming language.
+An AST interpreter for the Yaj programming language (with very unoriginal syntax).
   
 ## Features
  
