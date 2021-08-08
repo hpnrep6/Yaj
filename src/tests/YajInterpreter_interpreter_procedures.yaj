@@ -1,0 +1,13 @@
+var d := 24
+var g:= 2 + d;
+
+proc a {
+    d := d + 2
+    var c := d + 4
+    Out(c)
+}
+
+a()
+a()
+a()
+a()

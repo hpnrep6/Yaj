@@ -3,15 +3,24 @@ package yaj.backend.ast
 import yaj.backend.ast.visitor.Visitor
 import kotlin.String
 
-class GetFunc(name: Identifier, scope: Scope): Var() {
+class GetFunc(name: String, scope: Scope, parameters: MutableList<Node>): Node() {
     val name = name
-    override val scope = scope
+    val scope = scope
+    val parameters = parameters
 
-    override fun visit(visitor: Visitor): String {
-        TODO("Not yet implemented")
+    override fun visit(visitor: Visitor): Node? {
+        return visitor.visitFuncCall(this)
     }
 
     override fun toString(): String {
-        return "FuncLookup{$name}"
+        val params = StringBuilder()
+
+        params.append(parameters[0])
+
+        for (i in 1 until parameters.size) {
+            params.append(", ")
+            params.append(parameters[i])
+        }
+        return "FuncCall{$name}($params)"
     }
 }

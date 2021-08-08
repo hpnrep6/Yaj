@@ -1,13 +1,10 @@
-var d := 24
-var g:= 2 + d;
+func fib(n) {
 
-proc a {
-    d := d + 2
-    var c := d + 4
-    Out(c)
+    if (n <= 1) {
+        return n
+    }
+
+    return fib(n-1) + fib(n-2)
 }
 
-a()
-a()
-a()
-a()
+Out(fib(3))

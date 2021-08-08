@@ -134,18 +134,13 @@ class Parser(interpreter: YajInterpreter) {
                 }
 
                 TokenType.IDENTIFIER -> {
-                    if (!atEnd(1)) {
-                        if (tokens[index + 1].type == TokenType.PAREN_L) {
-                            val id = tokens[index++].value as Identifier
-                            nodes.add(GetProcedure(
-                                id.value,
-                                scope
-                            ))
-                            consume(TokenType.PAREN_L)
-                            consume(TokenType.PAREN_R)
-                            continue
-                        }
+                    val funcCall = funcCall(scope)
+
+                    if (funcCall != null) {
+                        nodes.add(funcCall)
+                        continue
                     }
+
                     val node = varGet(scope) ?: continue
 
                     nodes.add(node)
@@ -203,6 +198,28 @@ class Parser(interpreter: YajInterpreter) {
                     )
                 }
 
+                TokenType.FUNC -> {
+                    ++index
+
+                    val function = func(scope) ?: continue
+
+                    nodes.add(function)
+                }
+
+                TokenType.RETURN -> {
+                    ++index
+
+                    if (tokenIs(TokenType.NEW_LINE, 0, false) ||
+                        tokenIs(TokenType.SEMICOLON, 0, false)) {
+                        nodes.add(Return(Number(0.0)))
+                        continue
+                    }
+
+                    val expr = findOperation(scope) ?: continue
+
+                    nodes.add(Return(expr))
+                }
+
                 TokenType.EOF,
                 TokenType.BRACE_R -> {
                     ++index
@@ -218,6 +235,85 @@ class Parser(interpreter: YajInterpreter) {
         } while (curIs(TokenType.SEMICOLON, false) || curIs(TokenType.NEW_LINE, false))
 
         return Scene(nodes, scope)
+    }
+
+    fun funcCall(scope: Scope): Node? {
+        if (tokenIs(TokenType.PAREN_L, 1, false)) {
+            val id = tokens[index++].value as Identifier
+            if (tokenIs(TokenType.PAREN_R, 1, false)) {
+                val returnValue = GetProcedure(
+                    id.value,
+                    scope
+                )
+                consume(TokenType.PAREN_L)
+                consume(TokenType.PAREN_R)
+                return returnValue
+            } else {
+                ++index
+                val parameters = mutableListOf<Node>()
+
+                do {
+                    val operation = findOperation(scope) ?: break
+
+                    parameters.add(operation)
+
+                    if (curIs(TokenType.PAREN_R, false)) {
+                        ++index
+                        break
+                    }
+
+                    consume(TokenType.COMMA)
+                } while (true)
+
+                return GetFunc(
+                    id.value,
+                    scope,
+                    parameters
+                )
+            }
+        }
+        return null
+    }
+
+    fun func(scope: Scope): Node? {
+        val name = consume(TokenType.IDENTIFIER) ?: return null
+
+        consume(TokenType.PAREN_L) ?: return null
+
+        // No parameters: is procedure
+        if (tokenIs(TokenType.PAREN_R, 0, false)) {
+            ++index
+            val scene = scene(scope)
+
+            return DefProcedure((name.value as Identifier).value, scene, scope)
+        }
+
+        val parameterList = mutableListOf<String>()
+
+        do {
+            val parameter = consume(TokenType.IDENTIFIER) ?: return null
+
+            parameterList.add(
+                (parameter.value as Identifier).value
+            )
+
+            if (!curIs(TokenType.COMMA, false)) {
+                break
+            } else {
+                ++index
+            }
+        } while (true)
+
+        consume(TokenType.PAREN_R)
+
+        val scene = scene(scope)
+
+        return DefFunc(
+            (name.value as Identifier).value,
+            parameterList,
+            scene,
+            scope
+        )
     }
 
     fun varDef(scope: Scope): Node? {
@@ -241,22 +337,11 @@ class Parser(interpreter: YajInterpreter) {
         )
     }
 
-    fun assign_v(variable: Var, value: Node): Node {
-        return Assign(variable, value)
-    }
-
-    fun assign_p(variable: Var, value: Node): Node {
-        return PointerAssign(variable, value)
-    }
 
     fun assign(variable: Var, scope: Scope): Node? {
-        var assign = ::assign_v
-
         if (curIs(TokenType.ASSIGN_V, false)) {
             consume(TokenType.ASSIGN_V) ?: return null
-//        } else if (curIs(TokenType.ASSIGN_P, false)) {
-//            consume(TokenType.ASSIGN_P) ?: return null
-//            assign = ::assign_p
+
         } else {
             return Assign(variable, Number(0.0))
         }
@@ -264,20 +349,23 @@ class Parser(interpreter: YajInterpreter) {
         when (tokens[index].type) {
             TokenType.IDENTIFIER -> {
                 if (!atEnd()) {
-                    return findOperation(variable, scope, 0, assign)
+                    val findOp = findOperation(scope, 0) ?: return null
+                    return Assign(variable, findOp)
                 } else {
                     return Assign(variable, Number(0.0))
                 }
             }
 
             else -> {
-                return findOperation(variable, scope, 0, assign)
+                val findOp = findOperation(scope, 0) ?: return null
+
+                return Assign(variable, findOp)
             }
         }
 
     }
 
-    fun findOperation(variable: Var, scope: Scope, indexOffset: Int = 0, assignOp: (Var, Node) -> Node): Node? {
+    fun findOperation(scope: Scope, indexOffset: Int = 0): Node? {
         var offset = indexOffset
 
         // Skip tokens that give no hint to type of operation
@@ -292,10 +380,10 @@ class Parser(interpreter: YajInterpreter) {
         // Get hinted type of operation based on token
         when (tokens[index + offset].type) {
             TokenType.DOUBLE -> {
-                var findOp = findOperation(variable, scope, offset + 1, assignOp)
+                var findOp = findOperation(scope, offset + 1)
 
                 if (findOp == null) {
-                    return assignOp(variable, expr(scope))
+                    return expr(scope)
                 }
                 else {
                     return findOp
@@ -303,10 +391,10 @@ class Parser(interpreter: YajInterpreter) {
             }
 
             TokenType.IDENTIFIER -> {
-                var findOp = findOperation(variable, scope, offset + 1, assignOp)
+                var findOp = findOperation(scope, offset + 1)
 
                 if (findOp == null) {
-                    return assignOp(variable, getVar(scope))
+                    return getVar(scope)
                 }
                 else {
                     return findOp
@@ -321,11 +409,11 @@ class Parser(interpreter: YajInterpreter) {
             TokenType.MOD -> {
                 val evaluated = expr(scope)
 
-                return assignOp(variable, evaluated)
+                return evaluated
             }
 
             TokenType.STRING -> {
-                return assignOp(variable, stringConcat(scope))
+                return stringConcat(scope)
             }
 
             TokenType.BOOL,
@@ -338,7 +426,7 @@ class Parser(interpreter: YajInterpreter) {
             TokenType.GREATER,
             TokenType.LESS,
             TokenType.LESS_EQUALS -> {
-                return assignOp(variable, boolExpr(scope))
+                return boolExpr(scope)
             }
 
             else -> {
@@ -376,6 +464,12 @@ class Parser(interpreter: YajInterpreter) {
             }
 
             TokenType.IDENTIFIER -> {
+                val funcCall = funcCall(scope)
+
+                if (funcCall != null) {
+                    return funcCall
+                }
+
                 return getVar(scope)
             }
 
@@ -448,6 +542,12 @@ class Parser(interpreter: YajInterpreter) {
             }
 
             TokenType.IDENTIFIER -> {
+                val funcCall = funcCall(scope)
+
+                if (funcCall != null) {
+                    return funcCall
+                }
+
                 return getVar(scope)
             }
 
@@ -455,6 +555,9 @@ class Parser(interpreter: YajInterpreter) {
                 return expr(scope)
             }
 
+            TokenType.STRING -> {
+                return stringConcat(scope)
+            }
 
             else -> {
                 error()
@@ -481,7 +584,8 @@ class Parser(interpreter: YajInterpreter) {
 
                 TokenType.PAREN_R,
                 TokenType.NEW_LINE,
-                TokenType.SEMICOLON -> {
+                TokenType.SEMICOLON,
+                TokenType.COMMA -> {
                     return root
                 }
 
@@ -561,7 +665,8 @@ class Parser(interpreter: YajInterpreter) {
                 TokenType.GREATER_EQUALS,
                 TokenType.GREATER,
                 TokenType.LESS,
-                TokenType.LESS_EQUALS -> {
+                TokenType.LESS_EQUALS,
+                TokenType.COMMA, -> {
                     return root
                 }
 
@@ -611,13 +716,19 @@ class Parser(interpreter: YajInterpreter) {
             }
 
             TokenType.IDENTIFIER -> {
+                val funcCall = funcCall(scope)
+
+                if (funcCall != null) {
+                    return funcCall
+                }
+
                 return getVar(scope)
             }
 
             TokenType.PAREN_L -> {
                 ++index;
                 var node = expr(scope)
-                tokenIs(TokenType.PAREN_R)
+                consume(TokenType.PAREN_R)
                 return node
             }
 

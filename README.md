@@ -1,4 +1,4 @@
-## Yaj
+## Yaj Interpreter
 
 An AST interpreter for the Yaj programming language.
   
@@ -33,6 +33,16 @@ An AST interpreter for the Yaj programming language.
 - Output
   - Out (Defaults to kotlin's `println` function)
 
+## Example
+```
+var a := 2;
+var b := 3;
+
+Out(a + b)
+
+Out(a * 10);
+```
+
 ## Extended Backus-Naur form Grammar
 ```
 alpha = ? ASCII characters A to Z, a to z, À and onwards ? ;
@@ -51,21 +61,23 @@ string_definition = "'" | """ ;
 
 string_regular = string_definition, all_characters - string_definition, string_definition ;
 
-string_multiline = "\`", (all_characters | new_line) - "\`" , "\`" ;
+string_multiline = "`", (all_characters | new_line) - "`" , "`" ;
 
-number = numerical, { numerical | "." } ;
+number = numerical, { numerical }, ["."], { numerical } ;
 
 identifier = alphanumerical, { alphanumerical } ;
 
-assign = identifier, ":=", expr | boolExpr | stringConcat | identifier;
+operation = expr | boolExpr | stringConcat | identifier ;
+
+assign = identifier, ":=", operation ;
 
 var_decl = "var", assign ;
 
-num = "+" | "-" | number | identifier | ("(", expr, ")") ;
+num = ( number | identifier | ("(", expr, ")") ) | ( ( "+" | "-" ), num ) ;
 
-add_sub = num, \[ ("+" | "-"), mult_div] ;
+add_sub = num, [ ("+" | "-"), mult_div] ;
   
-mult_div = num, \[ ("\*", "/", "%"), num] ;
+mult_div = num, [ ("*", "/", "%"), num] ;
 
 expr = mult_div, add_sub ;
 
@@ -77,19 +89,25 @@ bool_op_unary = ("!", bool) | bool ;
 
 bool_op_bin = bool, ("&" | "|"), bool_op_unary ;
 
-boolExpr = bool_op_unary, \[{bool_op_bin}] ;
+boolExpr = bool_op_unary, [{bool_op_bin}] ;
 
 stringConcat = (string | identifier | number), ["+", stringConcat] ;
 
 out = "Out", "(", stringConcat, ")" ;
 
-if_statement = "if", "(", boolExpr, ")", "{", scene ;
+if_statement = "if", "(", boolExpr, ")", "{", scene, [else_statement] ;
+
+else_statement = "else", scene ;
 
 while_loop = "while", "(", boolExpr, ")", "{", scene ;
 
-procedure_decl = "proc", identifier, "{", scene ;
+procedure_decl = "proc", identifier, ["()"], "{", scene ;
 
 procedure_call = identifier, "(", ")" ;
+
+function_decl = "func", identifier, "(", identifier, { ",", identifier } , ")", "{", scene ;
+
+function_call = identifier, "(", operation, [{ ",", operation }], ")" ;
 
 scene = [{(
     var_decl | 
@@ -98,11 +116,13 @@ scene = [{(
     if_statement | 
     while_loop | 
     procedure_decl |
+    procedure_call |
+    function_decl |
     procedure_call
     ), endl}], 
     ("}" | ? EOF ? ) ;
 
-program = scene ;
+yaj_program = scene ;
 ```
 
 ## File structure

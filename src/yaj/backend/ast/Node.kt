@@ -10,7 +10,7 @@ abstract class Node {
         return this::class.toString()
     }
 
-    open fun compare(other: Node): Boolean {
+    open fun equals(other: Node): Boolean {
         return other == this
     }
 }

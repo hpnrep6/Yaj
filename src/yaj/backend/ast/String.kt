@@ -22,4 +22,13 @@ class String (value : String): Value() {
     override fun toString(): kotlin.String {
         return "\"${value}\""
     }
+
+    override fun equals(other: Node): Boolean {
+        if (other::class != this::class) {
+            return false
+        }
+
+        val asStr = other as yaj.backend.ast.String
+        return asStr.value == this.value
+    }
 }

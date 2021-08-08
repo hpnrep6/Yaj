@@ -6,6 +6,7 @@ import yaj.backend.ast.String
 
 abstract class Visitor {
     abstract fun visitScene(node: Scene): Node?
+    abstract fun visitReturn(node: Return): Node
 
     abstract fun visitBinary(node : Binary): Number
     abstract fun visitUnary(node : Unary): Number
@@ -27,13 +28,13 @@ abstract class Visitor {
 
     abstract fun visitPrint(node: Print): Unit
 
-    abstract fun visitProcCall(node: GetProcedure): Unit
+    abstract fun visitProcCall(node: GetProcedure): Node?
     abstract fun visitProcDef(node: DefProcedure): Unit
-    abstract fun visitFuncCall(node : Node): Any?
+    abstract fun visitFuncCall(node : GetFunc): Node?
     abstract fun visitFuncDef(node : DefFunc): Unit
 
-    abstract fun visitIf(node : If): Unit
+    abstract fun visitIf(node : If): Node?
 
-    abstract fun visitFor(node : Node): Unit
-    abstract fun visitWhile(node : While): Unit
+    abstract fun visitFor(node : Node): Node?
+    abstract fun visitWhile(node : While): Node?
 }

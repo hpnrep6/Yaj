@@ -12,7 +12,7 @@ fun initialistKeywords() : HashMap<kotlin.String, TokenType> {
     val keywordMap: HashMap<kotlin.String, TokenType> = HashMap<kotlin.String, TokenType>()
 
     keywordMap.put("var", TokenType.VAR_DEF)
-    keywordMap.put("func", TokenType.FUNC_DEF)
+    keywordMap.put("func", TokenType.FUNC)
     keywordMap.put("proc", TokenType.PROC)
     keywordMap.put("return", TokenType.RETURN)
     keywordMap.put("exit", TokenType.EXIT)

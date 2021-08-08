@@ -7,7 +7,7 @@ class GetProcedure(name: String, scope: Scope): Node() {
     val name = name
     val scope = scope
 
-    override fun visit(visitor: Visitor): Unit {
+    override fun visit(visitor: Visitor): Node? {
         return visitor.visitProcCall(this)
     }
 

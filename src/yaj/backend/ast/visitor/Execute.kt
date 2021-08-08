@@ -15,10 +15,22 @@ class Execute(interpreter: YajInterpreter): Visitor() {
         var nodes = node.nodes
 
         for (line in nodes) {
-            line.visit(this)
+            val value = line.visit(this)
+
+            if (value != Unit && value != null) {
+                return value as Node?
+            }
         }
 
+        // Clear all variables initialised in scope
+        node.scope.clear()
+
         return null
+    }
+
+    override fun visitReturn(node: Return): Node {
+
+        return node.value.visit(this) as Node
     }
 
 
@@ -72,11 +84,12 @@ class Execute(interpreter: YajInterpreter): Visitor() {
     }
 
     override fun visitBoolComparison(node: BoolComparison): Bool {
-        return Bool((node.left.visit(this) as Node).compare(node.right.visit(this) as Node))
+        return Bool((node.left.visit(this) as Node).equals(node.right.visit(this) as Node))
     }
 
     override fun visitNumComparison(node: NumComparison): Bool {
         val value = node.operator(node.left.visit(this) as Number, node.right.visit(this) as Number)
+
         return Bool(value)
     }
 
@@ -157,32 +170,59 @@ class Execute(interpreter: YajInterpreter): Visitor() {
         scope.addFunc(node.name, node.scene)
     }
 
-    override fun visitProcCall(node: GetProcedure) {
-        val scene = node.scope.getFunc(node.name) ?: return
+    override fun visitProcCall(node: GetProcedure): Node? {
+        val scene = node.scope.getFunc(node.name) ?: return null
 
-        scene.visit(this)
+        return scene.visit(this) as Node?
     }
 
     override fun visitFuncDef(node : DefFunc) {
+        val scope = node.scope
 
+        scope.addFunc(node.name, node)
     }
 
-    override fun visitFuncCall(node : Node) {
+    override fun visitFuncCall(node : GetFunc): Node? {
+        val scope = node.scope
+        val name = node.name
 
+        val funcGet = scope.getFunc(name) ?: return null
+        val func = funcGet as DefFunc
+
+        val args = node.parameters
+        val params = func.variables
+
+        if (params.size != args.size) {
+            return null
+        }
+
+        val funcScope = func.scene.scope
+
+        for (i in 0 until args.size) {
+            funcScope.addVar(
+                params[i], args[i].visit(this) as Node
+            )
+        }
+
+        val returnValue = func.scene.visit(this)
+
+        return returnValue
     }
 
 
     /**
      * Conditional
      */
-    override fun visitIf(node : If) {
+    override fun visitIf(node : If): Node? {
         val bool = node.operation.visit(this) as Bool
 
         if (bool.value) {
-            node.scene.visit(this)
+            return node.scene.visit(this) as Node?
         } else if (node.otherwise != null) {
-            node.otherwise.visit(this)
+            return node.otherwise.visit(this) as Node?
         }
+
+        return null
     }
 
 
@@ -190,20 +230,23 @@ class Execute(interpreter: YajInterpreter): Visitor() {
      * Loop
      */
 
-    override fun visitFor(node : Node) {
-
+    override fun visitFor(node : Node): Node? {
+        TODO()
     }
 
-    override fun visitWhile(node : While) {
+    override fun visitWhile(node : While): Node? {
         val boolExpr = node.condition
         val scene = node.scene
-var a = 0
-        while (
-            (boolExpr.visit(this) as Bool).value
-        ) {
-            scene.visit(this)
-            a++
-            if (a > 20) break
+
+        var returnValue: Node? = null
+
+        while ((boolExpr.visit(this) as Bool).value) {
+            returnValue = scene.visit(this)
+            if (returnValue != null) {
+                break
+            }
         }
+
+        return returnValue
     }
 }

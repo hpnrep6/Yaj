@@ -49,7 +49,7 @@ enum class TokenType {
 
 // Keywords
     VAR_DEF,        // var
-    FUNC_DEF,       // func
+    FUNC,           // func
     PROC,           // proc
     RETURN,         // return
     EXIT,           // exit

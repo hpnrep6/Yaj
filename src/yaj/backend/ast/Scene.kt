@@ -6,7 +6,7 @@ import kotlin.String
 class Scope(parent: Scope?) {
     val parent = parent
 
-    val funcs = hashMapOf<String, Scene>()
+    val funcs = hashMapOf<String, Node>()
 
     val vars = hashMapOf<String, Node>()
 
@@ -21,11 +21,16 @@ class Scope(parent: Scope?) {
         }
     }
 
+    fun clear() {
+        funcs.clear()
+        vars.clear()
+    }
+
     fun addVar(name: String, value: Node) {
         vars[name] = value
     }
 
-    fun addFunc(name: String, value: Scene) {
+    fun addFunc(name: String, value: Node) {
         funcs[name] = value
     }
 

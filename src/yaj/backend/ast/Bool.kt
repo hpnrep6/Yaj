@@ -18,7 +18,7 @@ class Bool(value: Boolean): Value() {
         return value.toString()
     }
 
-    override fun compare(other: Node): Boolean {
+    override fun equals(other: Node): Boolean {
         if (other::class == this::class) {
             return value == (other as Bool).value
         }

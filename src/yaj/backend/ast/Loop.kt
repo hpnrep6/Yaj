@@ -6,7 +6,7 @@ class While(condition: Node, scene: Scene): Node() {
     val condition = condition
     val scene = scene
 
-    override fun visit(visitor: Visitor): Unit {
+    override fun visit(visitor: Visitor): Node? {
         return visitor.visitWhile(this)
     }
 
