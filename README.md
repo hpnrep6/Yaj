@@ -5,9 +5,9 @@ An AST interpreter for the Yaj programming language (with very unoriginal syntax
 ## Features
  
 - Types
-  - Number (Kotlin double-precision floating point)
-  - String (Kotlin strings)
-  - Bool (Kotlin boolean)
+  - Number (Double-precision floating points)
+  - String (Strings)
+  - Bool (Booleans)
 - Control structures
   - If
   - Else
