@@ -124,7 +124,7 @@ class Scope(parent: Scope?) {
 class Scene(nodes: MutableList<Node>, scope: Scope): Node() {
     val nodes = nodes
 
-    val scope = scope
+    var scope = scope
 
     override fun visit(visitor: Visitor): Node? {
         return visitor.visitScene(this)

@@ -1,10 +1,14 @@
-func fib(n) {
+var test := 25;
 
-    if (n <= 1) {
-        return n
+func test(variable) {
+    test := variable * 4 + test
+    if (test > 200) {
+        Out(test + " is the value of test")
     }
-
-    return fib(n-1) + fib(n-2)
 }
 
-Out(fib(3))
+var i := 0
+while (i <= 10) {
+    test(i + 20)
+    i := i + 1
+}

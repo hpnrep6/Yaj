@@ -135,15 +135,6 @@ internal class YajInterpreterTest {
         Assign(VarDef{stringConcat}, Concat("stringtest is ", VarLookup{stringTest}))
         Assign(VarDef{str}, "add the two! ->")
         )
-        Variables(
-        str = "add the two! ->"
-        test = 26.0
-        d = 47.0
-        stringConcat = "stringtest is string test"
-        stringTest = "string test"
-        )
-        Functions(
-        )
     """.trimIndent()
 
     @Test
@@ -192,7 +183,7 @@ internal class YajInterpreterTest {
         assertEquals(interpreter_operations_expected,interpreter.output.toString())
     }
 
-    val interpreter_functions_expected = """
+    val interpreter_procedures_expected = """
         30
         32
         34
@@ -213,22 +204,35 @@ internal class YajInterpreterTest {
 
         node.visit(exec)
 
-        assertEquals(interpreter_functions_expected, interpreter.output.toString())
+        assertEquals(interpreter_procedures_expected, interpreter.output.toString())
     }
+
+    val interpreter_functions_expected = """
+        277 is the value of test
+        369 is the value of test
+        465 is the value of test
+        565 is the value of test
+        669 is the value of test
+        777 is the value of test
+        889 is the value of test
+        1005 is the value of test
+        1125 is the value of test
+        
+    """.trimIndent()
 
     @Test
     fun interpreter_functions() {
         val string = readFile("interpreter_functions.yaj")
-        val interpreter = YajInterpreter(string)
+        val interpreter = outputWrangler(string)
 
         var tokens = interpreter.lex()
 
         var node = interpreter.parse(tokens)
-//println(node)
+
         var exec = Execute(interpreter)
 
         node.visit(exec)
 
-        assertEquals(1,1)
+        assertEquals(interpreter_functions_expected, interpreter.output.toString())
     }
 }
