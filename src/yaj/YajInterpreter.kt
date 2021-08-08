@@ -2,22 +2,25 @@ package yaj
 
 import yaj.backend.Lexer
 import yaj.backend.parser.Parser
-import yaj.backend.Interpreter
 import yaj.backend.Token
 import yaj.backend.ast.Node
+import yaj.backend.ast.visitor.Execute
 
 open class YajInterpreter (source : String) {
-    val source = source
+    final val source = source
     val digitSeparator = '.'
 
     private var lexer : Lexer = Lexer(this)
     private var parser : Parser = Parser(this)
-    private var interpreter : Interpreter = Interpreter(this)
+    private var interpreter : Execute = Execute(this)
 
     var encounteredError = false
 
-    lateinit var tokens : MutableList<Token>
-
+    /**
+     * Perform lexical analysis on input
+     *
+     * @return Tokens generated from string
+     */
     public final fun lex(): MutableList<Token> {
         var tokens: MutableList<Token> = lexer.lex(source)
 
@@ -31,6 +34,12 @@ open class YajInterpreter (source : String) {
         return tokens
     }
 
+    /**
+     * Parse the output of the lexical analysis
+     *
+     * @param tokens Tokens generated from lexer
+     * @return Root node of parsed abstract syntax tree
+     */
     public final fun parse(tokens: MutableList<Token>) : Node {
         var ast = parser.parse(tokens, source)
 
@@ -44,22 +53,32 @@ open class YajInterpreter (source : String) {
         return ast
     }
 
-    public final fun interpret() {
-
+    /**
+     * Walks the abstract syntax tree and walk
+     *
+     * @param root Root AST node from parser
+     */
+    public final fun interpret(root: Node) {
+        root.visit(interpreter)
     }
 
+    /**
+     * Runs the program using the input.
+     * Passes the input through the lexer, parser,
+     * and AST visitor.
+     */
     public final fun run() : Boolean {
-        tokens = lex()
+        val tokens = lex()
         if (encounteredError) {
             return false
         }
 
-        parse(tokens)
+        val node = parse(tokens)
         if (encounteredError) {
             return false
         }
 
-        interpret()
+        interpret(node)
         if (encounteredError) {
             return false
         }
@@ -67,14 +86,29 @@ open class YajInterpreter (source : String) {
         return true
     }
 
+    /**
+     * Output message handling, from the Yaj "Out" function
+     *
+     * @param message Output message
+     */
     public open fun out(message : String) {
         println(message)
     }
 
+    /**
+     * Error output message handling
+     *
+     * @param message Error message
+     */
     public open fun errorOut(message : String) {
         out(message)
     }
 
+    /**
+     * Whether an error has been encountered
+     *
+     * @return if an error has occured
+     */
     public final fun hasEncounteredError() : Boolean {
         return encounteredError
     }
