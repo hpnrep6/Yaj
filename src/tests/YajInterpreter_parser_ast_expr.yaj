@@ -3,6 +3,6 @@ var d := 2 * test - 5;
 
 var stringTest := 'string' + ' test'
 
-stringConcat := 'stringtest is ' + stringTest;
+var stringConcat := 'stringtest is ' + stringTest;
 
-str := "add the two! ->" stringConcat + stringTest
+var str := "add the two! ->" stringConcat + stringTest

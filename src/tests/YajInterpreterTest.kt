@@ -33,6 +33,7 @@ internal class YajInterpreterTest {
     }
 
     val lexer_token_generation_content_expected = """
+        Token of type: START_OF with value: {None} at line: 0, column: 0
         Token of type: FUNC_DEF with value: {None} at line: 0, column: 3
         Token of type: IDENTIFIER with value: {test} at line: 0, column: 8
         Token of type: PAREN_L with value: {None} at line: 0, column: 9
@@ -61,6 +62,8 @@ internal class YajInterpreterTest {
         Token of type: IDENTIFIER with value: {g} at line: 5, column: 13
         Token of type: NEW_LINE with value: {None} at line: 5, column: 14
         Token of type: BRACE_R with value: {None} at line: 6, column: 1
+        Token of type: NEW_LINE with value: {None} at line: 6, column: 2
+        Token of type: EOF with value: {None} at line: 6, column: 2
     """.trimIndent().replace("\n", "")
 
     @Test
@@ -189,19 +192,27 @@ internal class YajInterpreterTest {
         assertEquals(interpreter_operations_expected,interpreter.output.toString())
     }
 
+    val interpreter_functions_expected = """
+        30
+        32
+        34
+        36
+        
+    """.trimIndent()
+
     @Test
     fun interpreter_functions() {
         val string = readFile("interpreter_functions.yaj")
-        val interpreter = YajInterpreter(string)
+        val interpreter = outputWrangler(string)
 
         var tokens = interpreter.lex()
 
         var node = interpreter.parse(tokens)
-println(node)
+
         var exec = Execute(interpreter)
 
         node.visit(exec)
 
-        assertEquals(1,1)
+        assertEquals(interpreter_functions_expected, interpreter.output.toString())
     }
 }

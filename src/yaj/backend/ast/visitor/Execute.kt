@@ -119,12 +119,24 @@ class Execute(interpreter: YajInterpreter): Visitor() {
 
     override fun visitPointerAssign(node: PointerAssign) {
         var scope = node.left.scope
-        var name = node.left.visit(this)
-
-        // Similar to assign, but do not precalculate the value
         var value = node.right
 
-        scope.addVar(name as String, value)
+        if (node.left::class == DefVar::class) {
+            val name = node.left.visit(this)
+            val nameString = name as String
+
+            scope.addVar(nameString, value)
+
+        } else {
+            val nameString = (node.left as GetVar).name
+
+            var varScope = scope.getVarScope(nameString)
+            if (varScope == null) {
+                return
+            } else {
+                varScope.addVar(nameString, value)
+            }
+        }
     }
 
 

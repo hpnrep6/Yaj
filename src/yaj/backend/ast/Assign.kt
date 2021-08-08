@@ -20,4 +20,8 @@ class PointerAssign(target: Var, value: Node): Assign(target, value) {
     override fun visit(visitor: Visitor) {
         return visitor.visitPointerAssign(this)
     }
+
+    override fun toString(): String {
+        return "PointerAssign($left, $right)"
+    }
 }

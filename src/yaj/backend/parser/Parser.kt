@@ -241,29 +241,43 @@ class Parser(interpreter: YajInterpreter) {
         )
     }
 
+    fun assign_v(variable: Var, value: Node): Node {
+        return Assign(variable, value)
+    }
+
+    fun assign_p(variable: Var, value: Node): Node {
+        return PointerAssign(variable, value)
+    }
+
     fun assign(variable: Var, scope: Scope): Node? {
+        var assign = ::assign_v
+
         if (curIs(TokenType.ASSIGN_V, false)) {
             consume(TokenType.ASSIGN_V) ?: return null
-
-            when (tokens[index].type) {
-                TokenType.IDENTIFIER -> {
-                    if (!atEnd()) {
-                        return findOperation(variable, scope)
-                    } else {
-                        return Assign(variable, Number(0.0))
-                    }
-                }
-
-                else -> {
-                    return findOperation(variable, scope)
-                }
-            }
+//        } else if (curIs(TokenType.ASSIGN_P, false)) {
+//            consume(TokenType.ASSIGN_P) ?: return null
+//            assign = ::assign_p
         } else {
             return Assign(variable, Number(0.0))
         }
+
+        when (tokens[index].type) {
+            TokenType.IDENTIFIER -> {
+                if (!atEnd()) {
+                    return findOperation(variable, scope, 0, assign)
+                } else {
+                    return Assign(variable, Number(0.0))
+                }
+            }
+
+            else -> {
+                return findOperation(variable, scope, 0, assign)
+            }
+        }
+
     }
 
-    fun findOperation(variable: Var, scope: Scope, indexOffset: Int = 0): Node? {
+    fun findOperation(variable: Var, scope: Scope, indexOffset: Int = 0, assignOp: (Var, Node) -> Node): Node? {
         var offset = indexOffset
 
         // Skip tokens that give no hint to type of operation
@@ -278,10 +292,10 @@ class Parser(interpreter: YajInterpreter) {
         // Get hinted type of operation based on token
         when (tokens[index + offset].type) {
             TokenType.DOUBLE -> {
-                var findOp = findOperation(variable, scope, offset + 1)
+                var findOp = findOperation(variable, scope, offset + 1, assignOp)
 
                 if (findOp == null) {
-                    return Assign(variable, expr(scope))
+                    return assignOp(variable, expr(scope))
                 }
                 else {
                     return findOp
@@ -289,10 +303,10 @@ class Parser(interpreter: YajInterpreter) {
             }
 
             TokenType.IDENTIFIER -> {
-                var findOp = findOperation(variable, scope, offset + 1)
+                var findOp = findOperation(variable, scope, offset + 1, assignOp)
 
                 if (findOp == null) {
-                    return Assign(variable, getVar(scope))
+                    return assignOp(variable, getVar(scope))
                 }
                 else {
                     return findOp
@@ -307,11 +321,11 @@ class Parser(interpreter: YajInterpreter) {
             TokenType.MOD -> {
                 val evaluated = expr(scope)
 
-                return Assign(variable, evaluated)
+                return assignOp(variable, evaluated)
             }
 
             TokenType.STRING -> {
-                return Assign(variable, stringConcat(scope))
+                return assignOp(variable, stringConcat(scope))
             }
 
             TokenType.BOOL,
@@ -324,7 +338,7 @@ class Parser(interpreter: YajInterpreter) {
             TokenType.GREATER,
             TokenType.LESS,
             TokenType.LESS_EQUALS -> {
-                return Assign(variable, boolExpr(scope))
+                return assignOp(variable, boolExpr(scope))
             }
 
             else -> {
