@@ -38,21 +38,62 @@ An AST interpreter for the Yaj programming language.
 - Classes
 - Runtime error reporting
 
-## Grammar
+## Extended Backus-Naur form Grammar
+```
+alpha = ? ASCII characters A to Z, a to z, À and onwards ? ;
 
-\<scene>:
+numerical = ? ASCII characters 0 to 9 ? ;
 
-\<variable-declaration>:
+alphanumerical = alpha | numerical ;
+
+new_line = ? new line character ? ;
+
+all_characters = ? all visible characters ? - new_line ;
+
+string_definition = "'" | """ ;
+
+string_regular = string_definition, all_characters - string_definition, string_definition ;
+
+string_multiline = "\`", (all_characters | new_line) - "\`" , "\`" ;
+
+number = numerical, { numerical | "." } ;
+
+identifier = alphanumerical, { alphanumerical } ;
+
+assign = identifier, ":=", expr | boolExpr | stringConcat | identifier;
+
+var_decl = "var", assign ;
+
+num = "+" | "-" | number | identifier | ("(", expr, ")") ;
+
+add_sub = num, \[ ("+" | "-"), mult_div] ;
   
-\<assign>:  
-  
-\<expr>:
-  
-\<number>:  
-  
-\<add-sub>:
-  
-\<mult_div>:  
+mult_div = num, \[ ("\*", "/", "%"), num] ;
+
+expr = mult_div, add_sub ;
+
+bool = "true" | "false" ;
+
+comparison = "=" | ">" | ">=" | "<" | "<=" ;
+
+bool_op_unary = ("!", bool) | bool ;
+
+bool_op_bin = bool, ("&" | "|"), bool_op_unary ;
+
+boolExpr = bool_op_unary, \[{bool_op_bin}] ;
+
+stringConcat = (string | identifier | number), ["+", stringConcat] ;
+
+out = "Out", "(", stringConcat, ")" ;
+
+if_statement = "if", "(", boolExpr, ")", "{", scene ;
+
+while_loop = "while", "(", boolExpr, ")", "{", scene ;
+
+scene = [{var_decl | assign | out | if_statement | while_loop}], ("}" | ? EOF ? ) ;
+
+program = scene
+```
 
 ## File structure
 
