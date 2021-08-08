@@ -27,6 +27,8 @@ abstract class Visitor {
 
     abstract fun visitPrint(node: Print): Unit
 
+    abstract fun visitProcCall(node: GetProcedure): Unit
+    abstract fun visitProcDef(node: DefProcedure): Unit
     abstract fun visitFuncCall(node : Node): Any?
     abstract fun visitFuncDef(node : DefFunc): Unit
 

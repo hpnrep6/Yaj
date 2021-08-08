@@ -99,19 +99,25 @@ internal class YajInterpreterTest {
 
     """.trimIndent()
 
-    class errorTracker(input : String) : YajInterpreter(input) {
+    class outputWrangler(input : String) : YajInterpreter(input) {
         val errors = StringBuilder()
+        val output = StringBuilder()
 
         override fun errorOut(error : String) {
             errors.append(error)
             errors.append("\n")
+        }
+
+        override fun out(message: String) {
+            output.append(message)
+            output.append("\n")
         }
     }
 
     @Test
     fun lexer_token_string_errors() {
         val string = readFile("lexer_token_string_error.yaj")
-        val interpreter = errorTracker(string)
+        val interpreter = outputWrangler(string)
 
         interpreter.lex()
 
@@ -153,15 +159,45 @@ internal class YajInterpreterTest {
         assertEquals(parser_ast_expr_expected, node.toString())
     }
 
+    val interpreter_operations_expected = """
+        0
+        1
+        2
+        3
+        5
+        8
+        13
+        21
+        34
+        55
+        
+    """.trimIndent()
+
     @Test
     fun interpreter_operations() {
         val string = readFile("interpreter_operations.yaj")
-        val interpreter = YajInterpreter(string)
+        val interpreter = outputWrangler(string)
 
         var tokens = interpreter.lex()
 
         var node = interpreter.parse(tokens)
 
+        var exec = Execute(interpreter)
+
+        node.visit(exec)
+
+        assertEquals(interpreter_operations_expected,interpreter.output.toString())
+    }
+
+    @Test
+    fun interpreter_functions() {
+        val string = readFile("interpreter_functions.yaj")
+        val interpreter = YajInterpreter(string)
+
+        var tokens = interpreter.lex()
+
+        var node = interpreter.parse(tokens)
+println(node)
         var exec = Execute(interpreter)
 
         node.visit(exec)

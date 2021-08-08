@@ -1,6 +1,16 @@
 var a := 2
 
-while(a < 5) {
-    Out(a)
+var b := 0
+var c := 1
+var sum
+
+while(a < 12) {
+    Out(sum)
+
+    sum := b + c
+
+    b := c
+    c := sum
+
     a := a + 1
 }

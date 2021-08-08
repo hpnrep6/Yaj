@@ -139,6 +139,18 @@ class Execute(interpreter: YajInterpreter): Visitor() {
     /**
      * Function
      */
+    override fun visitProcDef(node: DefProcedure) {
+        val scope = node.scope
+
+        scope.addFunc(node.name, node.scene)
+    }
+
+    override fun visitProcCall(node: GetProcedure) {
+        val scene = node.scope.getFunc(node.name) ?: return
+
+        scene.visit(this)
+    }
+
     override fun visitFuncDef(node : DefFunc) {
 
     }

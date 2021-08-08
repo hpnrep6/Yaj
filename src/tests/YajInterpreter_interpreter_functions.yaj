@@ -1,0 +1,8 @@
+proc a {
+    Out("test")
+}
+
+a()
+a()
+a()
+a()

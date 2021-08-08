@@ -26,7 +26,7 @@ class Scope(parent: Scope?) {
     }
 
     fun addFunc(name: String, value: Scene) {
-        vars[name] = value
+        funcs[name] = value
     }
 
     fun getVar(name: String): Node {
@@ -71,7 +71,44 @@ class Scope(parent: Scope?) {
     }
 
     fun getFunc(name: String): Node? {
-        return funcs[name]!!
+        val attempt = funcs[name]
+
+        if (parent == null) {
+            return attempt!!
+        }
+
+        if (attempt == null) {
+            return parent.getFunc(name)
+        }
+
+        return attempt
+    }
+
+    fun getFuncScope(name: String): Scope? {
+        val attempt = funcs[name]
+
+        if (attempt != null) {
+            return this
+        }
+
+        if (parent == null) {
+            return null
+        }
+
+        var parent = parent
+
+        while (true) {
+            if (parent == null) {
+                return null
+            }
+
+            var testParent = parent.funcs[name]
+
+            if (testParent != null) {
+                return parent
+            }
+            parent = parent.parent
+        }
     }
 
     override fun toString(): String {

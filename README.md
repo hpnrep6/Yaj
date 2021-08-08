@@ -24,6 +24,9 @@ An AST interpreter for the Yaj programming language.
   - Variable assignment
 - Loops
   - While
+- Procedures
+  - Procedure initialisation
+  - Procedure calls
 - Scope
   - Variable shadowing
   - Outer scope variable lookup
@@ -49,6 +52,8 @@ alphanumerical = alpha | numerical ;
 new_line = ? new line character ? ;
 
 all_characters = ? all visible characters ? - new_line ;
+
+endl = new_line | ";" ;
 
 string_definition = "'" | """ ;
 
@@ -90,7 +95,20 @@ if_statement = "if", "(", boolExpr, ")", "{", scene ;
 
 while_loop = "while", "(", boolExpr, ")", "{", scene ;
 
-scene = [{var_decl | assign | out | if_statement | while_loop}], ("}" | ? EOF ? ) ;
+procedure_decl = "proc", identifier, "{", scene ;
+
+procedure_call = identifier, "(", ")" ;
+
+scene = [{(
+    var_decl | 
+    assign | 
+    out | 
+    if_statement | 
+    while_loop | 
+    procedure_decl |
+    procedure_call
+    ), endl}], 
+    ("}" | ? EOF ? ) ;
 
 program = scene ;
 ```

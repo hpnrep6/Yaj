@@ -8,6 +8,7 @@ import yaj.backend.ast.Node
 import yaj.backend.ast.*
 import yaj.backend.ast.Number
 import yaj.backend.type.Double
+import yaj.backend.type.Identifier
 import kotlin.test.currentStackTrace
 
 class Parser(interpreter: YajInterpreter) {
@@ -133,6 +134,18 @@ class Parser(interpreter: YajInterpreter) {
                 }
 
                 TokenType.IDENTIFIER -> {
+                    if (!atEnd(1)) {
+                        if (tokens[index + 1].type == TokenType.PAREN_L) {
+                            val id = tokens[index++].value as Identifier
+                            nodes.add(GetProcedure(
+                                id.value,
+                                scope
+                            ))
+                            consume(TokenType.PAREN_L)
+                            consume(TokenType.PAREN_R)
+                            continue
+                        }
+                    }
                     val node = varGet(scope) ?: continue
 
                     nodes.add(node)
@@ -177,6 +190,17 @@ class Parser(interpreter: YajInterpreter) {
                     val scene = scene(scope)
 
                     nodes.add(While(boolExpr, scene))
+                }
+
+                TokenType.PROC -> {
+                    ++index
+                    val name = consume(TokenType.IDENTIFIER) ?: continue
+
+                    val scene = scene(scope)
+
+                    nodes.add(
+                        DefProcedure((name.value as Identifier).value, scene, scope)
+                    )
                 }
 
                 TokenType.EOF,
