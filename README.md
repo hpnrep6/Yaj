@@ -38,6 +38,10 @@ An AST interpreter for the Yaj programming language (with very unoriginal syntax
   - Outer scope variable lookup
 - Output
   - Out (Defaults to kotlin's `println` function)
+  - Cast to string
+- Debug
+  - Abstract syntax tree
+    - Print AST
 
 #### Todo
 - Support recursion (currently scopes are reused)
