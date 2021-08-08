@@ -105,4 +105,4 @@ program = scene
 | `src/yaj/backend/type/`        | Token variable types                    |
 | `src/yaj/backend/ast/`         | Abstract syntax tree files              |
 | `src/yaj/backend/ast/visitor/` | Abstract syntax tree visitor            |
-| `src/yaj/backend/parse/r`      | Parser to generate abstract syntax tree |
+| `src/yaj/backend/parser`       | Parser to generate abstract syntax tree |
