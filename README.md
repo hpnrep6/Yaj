@@ -81,6 +81,20 @@ while (i <= 10) {
 1125 is the value of example
 ```
 
+### API Example
+
+```
+import yaj.YajInterpreter
+
+fun main(args: Array<String>) {
+  val sourceString = readFromFile("example.yaj") // Function to read source code as string
+  
+  val interpreter = YajInterpreter(sourceString) // Create interpreter object using the source string
+  
+  interpreter.run() // Execute the yaj source code
+}
+```
+
 ## Extended Backus-Naur form Grammar
 ```
 alpha = ? ASCII characters A to Z, a to z, À and onwards ? ;
