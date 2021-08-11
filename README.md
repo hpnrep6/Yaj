@@ -89,7 +89,7 @@ import yaj.YajInterpreter
 fun main(args: Array<String>) {
   val sourceString = readFromFile("example.yaj") // Function to read source code as string
   
-  val interpreter = YajInterpreter(sourceString) // Create interpreter object using the source string
+  val interpreter = YajInterpreter(sourceString) // Create interpreter object
   
   interpreter.run() // Execute the yaj source code
 }
