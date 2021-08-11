@@ -44,7 +44,6 @@ An abstract syntax tree interpreter for the Yaj programming language (with very 
     - Print AST
 
 #### Todo
-- Support recursion (currently scopes are reused)
 - For loop syntactic sugar
 - Runtime error reporting (currently only reports errors in the lexer and parser stages)
 
