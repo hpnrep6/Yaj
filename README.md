@@ -1,13 +1,13 @@
 ## Yaj Interpreter
 
-An AST interpreter for the Yaj programming language (with very unoriginal syntax).
+An abstract syntax tree interpreter for the Yaj programming language (with very unoriginal syntax).
   
 ## Features
  
 - Types
-  - Number (Kotlin double-precision floating point)
-  - String (Kotlin strings)
-  - Bool (Kotlin boolean)
+  - Number (Double-precision floating points)
+  - String (Strings)
+  - Bool (Booleans)
 - Control structures
   - If
   - Else
@@ -38,6 +38,10 @@ An AST interpreter for the Yaj programming language (with very unoriginal syntax
   - Outer scope variable lookup
 - Output
   - Out (Defaults to kotlin's `println` function)
+  - Cast to string
+- Debug
+  - Abstract syntax tree
+    - Print AST
 
 #### Todo
 - Support recursion (currently scopes are reused)
@@ -76,6 +80,20 @@ Fib sequence at index 6 is 8
 Fib sequence at index 7 is 13
 Fib sequence at index 8 is 21
 Fib sequence at index 9 is 34
+```
+
+### API Example
+
+```
+import yaj.YajInterpreter
+
+fun main(args: Array<String>) {
+  val sourceString = readFromFile("example.yaj") // Function to read source code as string
+  
+  val interpreter = YajInterpreter(sourceString) // Create interpreter object using the source string
+  
+  interpreter.run() // Execute the yaj source code
+}
 ```
 
 ## Extended Backus-Naur form Grammar
