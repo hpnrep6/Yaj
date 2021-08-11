@@ -1,0 +1,14 @@
+func fib(iter) {
+    if (iter <= 1) {
+        return iter
+    }
+
+    return (fib(iter - 1) + fib(iter - 2))
+}
+
+var b := 0
+
+while (b < 10) {
+    Out("Fib sequence at index " + b + " is " + fib(b))
+    b := b + 1
+}

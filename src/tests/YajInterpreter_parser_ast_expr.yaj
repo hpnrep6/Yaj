@@ -5,4 +5,4 @@ var stringTest := 'string' + ' test'
 
 var stringConcat := 'stringtest is ' + stringTest;
 
-var str := "add the two! ->" stringConcat + stringTest
+var str := "add the two! ->" + stringConcat + stringTest

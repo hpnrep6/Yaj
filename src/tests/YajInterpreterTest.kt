@@ -133,7 +133,7 @@ internal class YajInterpreterTest {
         Assign(VarDef{d}, Add(Multiply(2.0, VarLookup{test}), Negative(5.0)))
         Assign(VarDef{stringTest}, Concat("string", " test"))
         Assign(VarDef{stringConcat}, Concat("stringtest is ", VarLookup{stringTest}))
-        Assign(VarDef{str}, "add the two! ->")
+        Assign(VarDef{str}, Concat("add the two! ->", Concat(VarLookup{stringConcat}, VarLookup{stringTest})))
         )
     """.trimIndent()
 
@@ -234,5 +234,35 @@ internal class YajInterpreterTest {
         node.visit(exec)
 
         assertEquals(interpreter_functions_expected, interpreter.output.toString())
+    }
+
+    val interpreter_recursion_expected = """
+        Fib sequence at index 0 is 0
+        Fib sequence at index 1 is 1
+        Fib sequence at index 2 is 1
+        Fib sequence at index 3 is 2
+        Fib sequence at index 4 is 3
+        Fib sequence at index 5 is 5
+        Fib sequence at index 6 is 8
+        Fib sequence at index 7 is 13
+        Fib sequence at index 8 is 21
+        Fib sequence at index 9 is 34
+        
+    """.trimIndent()
+
+    @Test
+    fun interpreter_recursion() {
+        val string = readFile("interpreter_recursion.yaj")
+        val interpreter = outputWrangler(string)
+
+        var tokens = interpreter.lex()
+
+        var node = interpreter.parse(tokens)
+
+        var exec = Execute(interpreter)
+
+        node.visit(exec)
+
+        assertEquals(interpreter_recursion_expected, interpreter.output.toString())
     }
 }

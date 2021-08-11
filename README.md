@@ -48,33 +48,34 @@ An AST interpreter for the Yaj programming language (with very unoriginal syntax
 
 ### Input
 ```
-var example := 25;
-
-func test(variable) {
-    example := variable * 4 + example
-    if (example > 200) {
-        Out(example + " is the value of example")
+func fib(iter) {
+    if (iter <= 1) {
+        return iter
     }
+
+    return (fib(iter - 1) + fib(iter - 2))
 }
 
-var i := 0
-while (i <= 10) {
-    test(i + 20)
-    i := i + 1
+var b := 0
+
+while (b < 10) {
+    Out("Fib sequence at index " + b + " is " + fib(b))
+    b := b + 1
 }
 ```
 
 ### Output
 ```
-277 is the value of example
-369 is the value of example
-465 is the value of example
-565 is the value of example
-669 is the value of example
-777 is the value of example
-889 is the value of example
-1005 is the value of example
-1125 is the value of example
+Fib sequence at index 0 is 0
+Fib sequence at index 1 is 1
+Fib sequence at index 2 is 1
+Fib sequence at index 3 is 2
+Fib sequence at index 4 is 3
+Fib sequence at index 5 is 5
+Fib sequence at index 6 is 8
+Fib sequence at index 7 is 13
+Fib sequence at index 8 is 21
+Fib sequence at index 9 is 34
 ```
 
 ## Extended Backus-Naur form Grammar

@@ -7,7 +7,7 @@ abstract class Binary (left : Node, operator : (Number, Number) -> Number, right
     val right = right
     val operator = operator
 
-    override fun visit(visitor: Visitor): Number {
+    override fun visit(visitor: Visitor): Any? {
         return visitor.visitBinary(this)
     }
 
@@ -20,7 +20,7 @@ abstract class Unary (operator : (Number) -> Number, right : Node) : Node() {
     val right = right
     val operator = operator
 
-    override fun visit(visitor: Visitor): Number {
+    override fun visit(visitor: Visitor): Any? {
         return visitor.visitUnary(this)
     }
 

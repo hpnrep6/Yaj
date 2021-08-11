@@ -107,12 +107,11 @@ class Parser(interpreter: YajInterpreter) {
         return root
     }
 
-    fun scene(parent: Scope? = null): Scene {
+    fun scene(): Scene {
         val nodes = mutableListOf<Node>()
-        val scope = Scope(parent)
 
         if (atEnd())
-            return Scene(nodes, scope)
+            return Scene(nodes)
 
         if (tokens[index].type == TokenType.BRACE_L ||
             tokens[index].type == TokenType.START_OF) {
@@ -128,27 +127,27 @@ class Parser(interpreter: YajInterpreter) {
             when (tokens[index].type) {
                 TokenType.VAR_DEF -> {
                     ++index
-                    val node = varDef(scope) ?: continue
+                    val node = varDef() ?: continue
 
                     nodes.add(node)
                 }
 
                 TokenType.IDENTIFIER -> {
-                    val funcCall = funcCall(scope)
+                    val funcCall = funcCall()
 
                     if (funcCall != null) {
                         nodes.add(funcCall)
                         continue
                     }
 
-                    val node = varGet(scope) ?: continue
+                    val node = varGet() ?: continue
 
                     nodes.add(node)
                 }
 
                 TokenType.OUT -> {
                     ++index
-                    val out = out(scope) ?: continue
+                    val out = out() ?: continue
 
                     nodes.add(out)
                 }
@@ -157,18 +156,18 @@ class Parser(interpreter: YajInterpreter) {
                     ++index
                     consume(TokenType.PAREN_L) ?: continue
 
-                    val boolExpr = boolExpr(scope)
+                    val boolExpr = boolExpr()
 
                     consume(TokenType.PAREN_R) ?: continue
 
-                    val scene = scene(scope)
+                    val scene = scene()
 
                     var otherwise: Scene? = null
 
                     if (tokenIs(TokenType.ELSE, 0, false)) {
                         consume(TokenType.ELSE)
 
-                        otherwise = scene(scope)
+                        otherwise = scene()
                     }
 
                     nodes.add(If(boolExpr, scene, otherwise))
@@ -178,11 +177,11 @@ class Parser(interpreter: YajInterpreter) {
                     ++index
                     consume(TokenType.PAREN_L) ?: continue
 
-                    val boolExpr = boolExpr(scope)
+                    val boolExpr = boolExpr()
 
                     consume(TokenType.PAREN_R) ?: continue
 
-                    val scene = scene(scope)
+                    val scene = scene()
 
                     nodes.add(While(boolExpr, scene))
                 }
@@ -191,17 +190,17 @@ class Parser(interpreter: YajInterpreter) {
                     ++index
                     val name = consume(TokenType.IDENTIFIER) ?: continue
 
-                    val scene = scene(scope)
+                    val scene = scene()
 
                     nodes.add(
-                        DefProcedure((name.value as Identifier).value, scene, scope)
+                        DefProcedure((name.value as Identifier).value, scene)
                     )
                 }
 
                 TokenType.FUNC -> {
                     ++index
 
-                    val function = func(scope) ?: continue
+                    val function = func() ?: continue
 
                     nodes.add(function)
                 }
@@ -215,7 +214,7 @@ class Parser(interpreter: YajInterpreter) {
                         continue
                     }
 
-                    val expr = findOperation(scope) ?: continue
+                    val expr = findOperation() ?: continue
 
                     nodes.add(Return(expr))
                 }
@@ -234,16 +233,15 @@ class Parser(interpreter: YajInterpreter) {
 
         } while (curIs(TokenType.SEMICOLON, false) || curIs(TokenType.NEW_LINE, false))
 
-        return Scene(nodes, scope)
+        return Scene(nodes, )
     }
 
-    fun funcCall(scope: Scope): Node? {
+    fun funcCall(): Node? {
         if (tokenIs(TokenType.PAREN_L, 1, false)) {
             val id = tokens[index++].value as Identifier
             if (tokenIs(TokenType.PAREN_R, 1, false)) {
                 val returnValue = GetProcedure(
-                    id.value,
-                    scope
+                    id.value
                 )
                 consume(TokenType.PAREN_L)
                 consume(TokenType.PAREN_R)
@@ -253,7 +251,7 @@ class Parser(interpreter: YajInterpreter) {
                 val parameters = mutableListOf<Node>()
 
                 do {
-                    val operation = findOperation(scope) ?: break
+                    val operation = findOperation() ?: break
 
                     parameters.add(operation)
 
@@ -267,7 +265,6 @@ class Parser(interpreter: YajInterpreter) {
 
                 return GetFunc(
                     id.value,
-                    scope,
                     parameters
                 )
             }
@@ -275,7 +272,7 @@ class Parser(interpreter: YajInterpreter) {
         return null
     }
 
-    fun func(scope: Scope): Node? {
+    fun func(): Node? {
         val name = consume(TokenType.IDENTIFIER) ?: return null
 
         consume(TokenType.PAREN_L) ?: return null
@@ -283,9 +280,9 @@ class Parser(interpreter: YajInterpreter) {
         // No parameters: is procedure
         if (tokenIs(TokenType.PAREN_R, 0, false)) {
             ++index
-            val scene = scene(scope)
+            val scene = scene()
 
-            return DefProcedure((name.value as Identifier).value, scene, scope)
+            return DefProcedure((name.value as Identifier).value, scene)
         }
 
         val parameterList = mutableListOf<String>()
@@ -306,39 +303,37 @@ class Parser(interpreter: YajInterpreter) {
 
         consume(TokenType.PAREN_R)
 
-        val scene = scene(scope)
+        val scene = scene()
 
         return DefFunc(
             (name.value as Identifier).value,
             parameterList,
-            scene,
-            scope
+            scene
         )
     }
 
-    fun varDef(scope: Scope): Node? {
+    fun varDef(): Node? {
         val name = consume(TokenType.IDENTIFIER) ?: return null
 
-        val definition = DefVar(((name.value as yaj.backend.type.Identifier).value), scope)
+        val definition = DefVar(((name.value as yaj.backend.type.Identifier).value), )
 
-        return assign(definition, scope)
+        return assign(definition)
     }
 
-    fun varGet(scope: Scope): Node? {
-        val variable = getVar(scope)
+    fun varGet(): Node? {
+        val variable = getVar()
 
-        return assign(variable, scope)
+        return assign(variable)
     }
 
-    fun getVar(scope: Scope): GetVar {
+    fun getVar(): GetVar {
         return GetVar(
-            (tokens[index++].value as yaj.backend.type.Identifier).value,
-            scope
+            (tokens[index++].value as yaj.backend.type.Identifier).value
         )
     }
 
 
-    fun assign(variable: Var, scope: Scope): Node? {
+    fun assign(variable: Var): Node? {
         if (curIs(TokenType.ASSIGN_V, false)) {
             consume(TokenType.ASSIGN_V) ?: return null
 
@@ -349,7 +344,7 @@ class Parser(interpreter: YajInterpreter) {
         when (tokens[index].type) {
             TokenType.IDENTIFIER -> {
                 if (!atEnd()) {
-                    val findOp = findOperation(scope, 0) ?: return null
+                    val findOp = findOperation(0) ?: return null
                     return Assign(variable, findOp)
                 } else {
                     return Assign(variable, Number(0.0))
@@ -357,7 +352,7 @@ class Parser(interpreter: YajInterpreter) {
             }
 
             else -> {
-                val findOp = findOperation(scope, 0) ?: return null
+                val findOp = findOperation(0) ?: return null
 
                 return Assign(variable, findOp)
             }
@@ -365,7 +360,7 @@ class Parser(interpreter: YajInterpreter) {
 
     }
 
-    fun findOperation(scope: Scope, indexOffset: Int = 0): Node? {
+    fun findOperation(indexOffset: Int = 0): Node? {
         var offset = indexOffset
 
         // Skip tokens that give no hint to type of operation
@@ -380,10 +375,10 @@ class Parser(interpreter: YajInterpreter) {
         // Get hinted type of operation based on token
         when (tokens[index + offset].type) {
             TokenType.DOUBLE -> {
-                var findOp = findOperation(scope, offset + 1)
+                var findOp = findOperation(offset + 1)
 
                 if (findOp == null) {
-                    return expr(scope)
+                    return expr()
                 }
                 else {
                     return findOp
@@ -391,10 +386,10 @@ class Parser(interpreter: YajInterpreter) {
             }
 
             TokenType.IDENTIFIER -> {
-                var findOp = findOperation(scope, offset + 1)
+                var findOp = findOperation(offset + 1)
 
                 if (findOp == null) {
-                    return getVar(scope)
+                    return getVar()
                 }
                 else {
                     return findOp
@@ -407,13 +402,13 @@ class Parser(interpreter: YajInterpreter) {
             TokenType.DIV,
             TokenType.POW,
             TokenType.MOD -> {
-                val evaluated = expr(scope)
+                val evaluated = expr()
 
                 return evaluated
             }
 
             TokenType.STRING -> {
-                return stringConcat(scope)
+                return stringConcat()
             }
 
             TokenType.BOOL,
@@ -426,7 +421,7 @@ class Parser(interpreter: YajInterpreter) {
             TokenType.GREATER,
             TokenType.LESS,
             TokenType.LESS_EQUALS -> {
-                return boolExpr(scope)
+                return boolExpr()
             }
 
             else -> {
@@ -435,13 +430,13 @@ class Parser(interpreter: YajInterpreter) {
         }
     }
 
-    fun out(scope: Scope): Print? {
+    fun out(): Print? {
         consume(TokenType.PAREN_L) ?: return null
 
         if (!atEnd()) {
             var str : Node
 
-            str = stringConcat(scope)
+            str = stringConcat()
 
             consume(TokenType.PAREN_R) ?: return null
 
@@ -455,7 +450,7 @@ class Parser(interpreter: YajInterpreter) {
      * String
      */
 
-    fun string(scope: Scope): Node? {
+    fun string(): Node? {
         when (tokens[index].type) {
             TokenType.STRING -> {
                 return String(
@@ -464,13 +459,13 @@ class Parser(interpreter: YajInterpreter) {
             }
 
             TokenType.IDENTIFIER -> {
-                val funcCall = funcCall(scope)
+                val funcCall = funcCall()
 
                 if (funcCall != null) {
                     return funcCall
                 }
 
-                return getVar(scope)
+                return getVar()
             }
 
             TokenType.DOUBLE -> {
@@ -485,8 +480,8 @@ class Parser(interpreter: YajInterpreter) {
         }
     }
 
-    fun stringConcat(scope: Scope): Node {
-        var root = string(scope)
+    fun stringConcat(): Node {
+        var root = string()
 
         if (root == null) {
             error()
@@ -501,7 +496,7 @@ class Parser(interpreter: YajInterpreter) {
                     TokenType.STRING,
                     TokenType.IDENTIFIER,
                     TokenType.DOUBLE -> {
-                        return StringConcat(root, stringConcat(scope))
+                        return StringConcat(root, stringConcat())
                     }
                 }
             } else {
@@ -517,7 +512,7 @@ class Parser(interpreter: YajInterpreter) {
      * Boolean
      */
 
-    fun bool(scope: Scope): Node {
+    fun bool(): Node {
         if (atEnd()) {
             error(-1)
             return Bool(false)
@@ -526,7 +521,7 @@ class Parser(interpreter: YajInterpreter) {
         when (tokens[index].type) {
             TokenType.NOT -> {
                 ++index
-                return Not(bool(scope))
+                return Not(bool())
             }
 
             TokenType.BOOL -> {
@@ -535,28 +530,28 @@ class Parser(interpreter: YajInterpreter) {
 
             TokenType.PAREN_L -> {
                 ++index
-                var node = boolExpr(scope)
+                var node = boolExpr()
                 consume(TokenType.PAREN_R) ?: return Bool(false)
 
                 return node
             }
 
             TokenType.IDENTIFIER -> {
-                val funcCall = funcCall(scope)
+                val funcCall = funcCall()
 
                 if (funcCall != null) {
                     return funcCall
                 }
 
-                return getVar(scope)
+                return getVar()
             }
 
             TokenType.DOUBLE -> {
-                return expr(scope)
+                return expr()
             }
 
             TokenType.STRING -> {
-                return stringConcat(scope)
+                return stringConcat()
             }
 
             else -> {
@@ -567,19 +562,19 @@ class Parser(interpreter: YajInterpreter) {
         }
     }
 
-    fun boolExpr(scope: Scope): Node {
-        val root = bool(scope)
+    fun boolExpr(): Node {
+        val root = bool()
 
         if (!atEnd())
             when (tokens[index].type) {
                 TokenType.OR -> {
                     ++index
-                    return Or(root, boolExpr(scope))
+                    return Or(root, boolExpr())
                 }
 
                 TokenType.AND -> {
                     ++index
-                    return And(root, boolExpr(scope))
+                    return And(root, boolExpr())
                 }
 
                 TokenType.PAREN_R,
@@ -591,32 +586,32 @@ class Parser(interpreter: YajInterpreter) {
 
                 TokenType.EQUALS -> {
                     ++index
-                    return Equals(root, boolExpr(scope))
+                    return Equals(root, boolExpr())
                 }
 
                 TokenType.NOT_EQUALS -> {
                     ++index
-                    return NotEquals(root, boolExpr(scope))
+                    return NotEquals(root, boolExpr())
                 }
 
                 TokenType.GREATER_EQUALS -> {
                     ++index
-                    return GreaterEquals(root, boolExpr(scope))
+                    return GreaterEquals(root, boolExpr())
                 }
 
                 TokenType.LESS_EQUALS -> {
                     ++index
-                    return LessEquals(root, boolExpr(scope))
+                    return LessEquals(root, boolExpr())
                 }
 
                 TokenType.LESS -> {
                     ++index
-                    return Less(root, boolExpr(scope))
+                    return Less(root, boolExpr())
                 }
 
                 TokenType.GREATER -> {
                     ++index
-                    return Greater(root, boolExpr(scope))
+                    return Greater(root, boolExpr())
                 }
 
                 else -> {
@@ -631,24 +626,24 @@ class Parser(interpreter: YajInterpreter) {
      * Number
      */
 
-    fun mult_div(scope: Scope) : Node {
-        var root = num(scope)
+    fun mult_div() : Node {
+        var root = num()
 
         while (!atEnd()) {
             when (tokens[index].type) {
                 TokenType.MULT -> {
                     ++index
-                    root = Multiply(root, num(scope))
+                    root = Multiply(root, num())
                 }
 
                 TokenType.DIV -> {
                     ++index
-                    root = Divide(root, num(scope))
+                    root = Divide(root, num())
                 }
 
                 TokenType.MOD -> {
                     ++index
-                    root = Modulo(root, num(scope))
+                    root = Modulo(root, num())
                 }
 
                 TokenType.ADD,
@@ -680,19 +675,19 @@ class Parser(interpreter: YajInterpreter) {
         return root
     }
 
-    fun add_sub(node: Node, scope: Scope) : Node {
+    fun add_sub(node: Node) : Node {
         var root = node
 
         while (!atEnd()) {
             when (tokens[index].type) {
                 TokenType.ADD -> {
                     ++index
-                    root = Add(root, Positive(mult_div(scope)))
+                    root = Add(root, Positive(mult_div()))
                 }
 
                 TokenType.SUB -> {
                     ++index
-                    root = Add(root, Negative(mult_div(scope)))
+                    root = Add(root, Negative(mult_div()))
                 }
 
                 else -> {
@@ -704,7 +699,7 @@ class Parser(interpreter: YajInterpreter) {
         return root
     }
 
-    fun num(scope: Scope) : Node {
+    fun num() : Node {
         if (atEnd()) {
             error(-1)
             return Number(0.0)
@@ -716,18 +711,18 @@ class Parser(interpreter: YajInterpreter) {
             }
 
             TokenType.IDENTIFIER -> {
-                val funcCall = funcCall(scope)
+                val funcCall = funcCall()
 
                 if (funcCall != null) {
                     return funcCall
                 }
 
-                return getVar(scope)
+                return getVar()
             }
 
             TokenType.PAREN_L -> {
                 ++index;
-                var node = expr(scope)
+                var node = expr()
                 consume(TokenType.PAREN_R)
                 return node
             }
@@ -735,13 +730,13 @@ class Parser(interpreter: YajInterpreter) {
             TokenType.ADD -> {
                 ++index
 
-                return Positive(num(scope))
+                return Positive(num())
             }
 
             TokenType.SUB -> {
                 ++index
 
-                return Negative(num(scope))
+                return Negative(num())
             }
 
             else -> {
@@ -755,8 +750,8 @@ class Parser(interpreter: YajInterpreter) {
         }
     }
 
-    fun expr(scope: Scope) : Node {
-        var root = mult_div(scope)
-        return add_sub(root, scope)
+    fun expr() : Node {
+        var root = mult_div()
+        return add_sub(root)
     }
 }

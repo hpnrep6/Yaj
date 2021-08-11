@@ -3,13 +3,11 @@ package yaj.backend.ast
 import yaj.backend.ast.visitor.Visitor
 import kotlin.String
 
-class DefFunc (name: String, variables: MutableList<String>, scene: Scene, scope: Scope): Node() {
+class DefFunc (name: String, variables: MutableList<String>, scene: Scene): Node() {
     val name = name
     val scene = scene
     val variables = variables
-    val scope = scope
-
-    override fun visit(visitor : Visitor): Unit {
+    override fun visit(visitor : Visitor): Any? {
         return visitor.visitFuncDef(this)
     }
 
@@ -24,4 +22,9 @@ class DefFunc (name: String, variables: MutableList<String>, scene: Scene, scope
         }
         return "FuncDef{$name}($params,\n$scene)"
     }
+}
+
+class FuncParam(name: String, node: Node) {
+    val name = name
+    val node = node
 }

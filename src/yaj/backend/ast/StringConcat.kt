@@ -6,7 +6,7 @@ class StringConcat(left: Node, right: Node): Node() {
     val left = left
     val right = right
 
-    override fun visit(visitor: Visitor): String {
+    override fun visit(visitor: Visitor): Any? {
         return visitor.visitStringConcat(this)
     }
 

@@ -3,12 +3,10 @@ package yaj.backend.ast
 import yaj.backend.ast.visitor.Visitor
 import kotlin.String
 
-class DefVar(name : String, scope: Scope) : Var() {
+class DefVar(name : String) : Var() {
     val name = name
 
-    override val scope = scope
-
-    override fun visit(visitor : Visitor): String {
+    override fun visit(visitor : Visitor): Any? {
         return visitor.visitVarDef(this)
     }
 

@@ -4,8 +4,9 @@ import yaj.YajInterpreter
 import yaj.backend.ast.*
 import yaj.backend.ast.Number
 
-class Execute(interpreter: YajInterpreter): Visitor() {
+open class Execute(interpreter: YajInterpreter, parent: Scope? = null): Visitor() {
     val interpreter = interpreter
+    val scope = Scope(parent)
 
     /**
      * Scene
@@ -13,17 +14,28 @@ class Execute(interpreter: YajInterpreter): Visitor() {
 
     override fun visitScene(node: Scene): Node? {
         var nodes = node.nodes
+        val visitor = Execute(interpreter, scope)
+
+        if (node.params.isNotEmpty()) {
+            for (i in 0 until node.params.size) {
+                visitor.scope.addVar(
+                    node.params[i].name, node.params[i].node
+                )
+            }
+
+            node.params.clear()
+        }
 
         for (line in nodes) {
-            val value = line.visit(this)
+            val value = line.visit(visitor)
 
             if (value != Unit && value != null) {
+                visitor.scope.clear()
                 return value as Node?
             }
         }
 
-        // Clear all variables initialised in scope
-        node.scope.clear()
+        visitor.scope.clear()
 
         return null
     }
@@ -56,6 +68,13 @@ class Execute(interpreter: YajInterpreter): Visitor() {
      */
 
     override fun visitStringConcat(node: StringConcat): yaj.backend.ast.String {
+        val output = (node.visit(Printer(interpreter, scope)))!!
+
+        if (output::class != String::class) {
+            return yaj.backend.ast.String((output as Node).toPrint())
+        } else {
+            yaj.backend.ast.String(output as String)
+        }
 
         return yaj.backend.ast.String(
             node.toPrint()
@@ -103,13 +122,10 @@ class Execute(interpreter: YajInterpreter): Visitor() {
     }
 
     override fun visitVarGet(node: GetVar): Node {
-        var scope = node.scope
-
         return scope.getVar(node.name)
     }
 
     override fun visitAssign(node : Assign) {
-        var scope = node.left.scope
         var value = node.right.visit(this)
 
         if (node.left::class == DefVar::class) {
@@ -131,7 +147,6 @@ class Execute(interpreter: YajInterpreter): Visitor() {
     }
 
     override fun visitPointerAssign(node: PointerAssign) {
-        var scope = node.left.scope
         var value = node.right
 
         if (node.left::class == DefVar::class) {
@@ -157,7 +172,13 @@ class Execute(interpreter: YajInterpreter): Visitor() {
      * Output
      */
     override fun visitPrint(node: Print) {
-        interpreter.out((node.node.visit(this) as Node).toPrint())
+        val output = (node.node.visit(Printer(interpreter, scope)))!!
+
+        if (output::class != String::class) {
+            interpreter.out((output as Node).toPrint())
+        } else {
+            interpreter.out(output as String)
+        }
     }
 
 
@@ -165,25 +186,20 @@ class Execute(interpreter: YajInterpreter): Visitor() {
      * Function
      */
     override fun visitProcDef(node: DefProcedure) {
-        val scope = node.scope
-
         scope.addFunc(node.name, node.scene)
     }
 
     override fun visitProcCall(node: GetProcedure): Node? {
-        val scene = node.scope.getFunc(node.name) ?: return null
+        val scene = scope.getFunc(node.name) ?: return null
 
         return scene.visit(this) as Node?
     }
 
     override fun visitFuncDef(node : DefFunc) {
-        val scope = node.scope
-
         scope.addFunc(node.name, node)
     }
 
     override fun visitFuncCall(node : GetFunc): Node? {
-        val scope = node.scope
         val name = node.name
 
         val funcGet = scope.getFunc(name) ?: return null
@@ -196,17 +212,15 @@ class Execute(interpreter: YajInterpreter): Visitor() {
             return null
         }
 
-        val funcScope = func.scene.scope
-
         for (i in 0 until args.size) {
-            funcScope.addVar(
-                params[i], args[i].visit(this) as Node
+            func.scene.params.add(
+                FuncParam(params[i], args[i].visit(this) as Node)
             )
         }
 
         val returnValue = func.scene.visit(this)
 
-        return returnValue
+        return returnValue as Node?
     }
 
 
@@ -241,7 +255,7 @@ class Execute(interpreter: YajInterpreter): Visitor() {
         var returnValue: Node? = null
 
         while ((boolExpr.visit(this) as Bool).value) {
-            returnValue = scene.visit(this)
+            returnValue = scene.visit(this) as Node?
             if (returnValue != null) {
                 break
             }

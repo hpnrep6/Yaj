@@ -5,36 +5,36 @@ import yaj.backend.ast.Number
 import yaj.backend.ast.String
 
 abstract class Visitor {
-    abstract fun visitScene(node: Scene): Node?
-    abstract fun visitReturn(node: Return): Node
+    abstract fun visitScene(node: Scene): Any?
+    abstract fun visitReturn(node: Return): Any?
 
-    abstract fun visitBinary(node : Binary): Number
-    abstract fun visitUnary(node : Unary): Number
-    abstract fun visitNumber(node: Number): Number
+    abstract fun visitBinary(node : Binary): Any?
+    abstract fun visitUnary(node : Unary): Any?
+    abstract fun visitNumber(node: Number): Any?
 
-    abstract fun visitStringConcat(node: StringConcat): String
-    abstract fun visitString(node: String): String
+    abstract fun visitStringConcat(node: StringConcat): Any?
+    abstract fun visitString(node: String): Any?
 
-    abstract fun visitBool(node: Bool): Bool
-    abstract fun visitBoolBinary(node: BoolBinary): Bool
-    abstract fun visitBoolUnary(node: BoolUnary): Bool
-    abstract fun visitBoolComparison(node: BoolComparison): Bool
-    abstract fun visitNumComparison(node: NumComparison): Bool
+    abstract fun visitBool(node: Bool): Any?
+    abstract fun visitBoolBinary(node: BoolBinary): Any?
+    abstract fun visitBoolUnary(node: BoolUnary): Any?
+    abstract fun visitBoolComparison(node: BoolComparison): Any?
+    abstract fun visitNumComparison(node: NumComparison): Any?
 
-    abstract fun visitVarDef(node : DefVar): kotlin.String
-    abstract fun visitVarGet(node: GetVar): Node
-    abstract fun visitAssign(node : Assign): Unit
-    abstract fun visitPointerAssign(node: PointerAssign): Unit
+    abstract fun visitVarDef(node : DefVar): Any?
+    abstract fun visitVarGet(node: GetVar): Any?
+    abstract fun visitAssign(node : Assign): Any?
+    abstract fun visitPointerAssign(node: PointerAssign): Any?
 
-    abstract fun visitPrint(node: Print): Unit
+    abstract fun visitPrint(node: Print): Any?
 
-    abstract fun visitProcCall(node: GetProcedure): Node?
-    abstract fun visitProcDef(node: DefProcedure): Unit
-    abstract fun visitFuncCall(node : GetFunc): Node?
-    abstract fun visitFuncDef(node : DefFunc): Unit
+    abstract fun visitProcCall(node: GetProcedure): Any?
+    abstract fun visitProcDef(node: DefProcedure): Any?
+    abstract fun visitFuncCall(node : GetFunc): Any?
+    abstract fun visitFuncDef(node : DefFunc): Any?
 
-    abstract fun visitIf(node : If): Node?
+    abstract fun visitIf(node : If): Any?
 
-    abstract fun visitFor(node : Node): Node?
-    abstract fun visitWhile(node : While): Node?
+    abstract fun visitFor(node : Node): Any?
+    abstract fun visitWhile(node : While): Any?
 }

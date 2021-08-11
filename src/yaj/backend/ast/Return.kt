@@ -5,7 +5,7 @@ import yaj.backend.ast.visitor.Visitor
 class Return(value: Node): Node() {
     val value = value
 
-    override fun visit(visitor: Visitor): Node {
+    override fun visit(visitor: Visitor): Any? {
         return visitor.visitReturn(this)
     }
 

@@ -11,7 +11,7 @@ class String (value : String): Value() {
 
     }
 
-    override fun visit(visitor : Visitor): yaj.backend.ast.String {
+    override fun visit(visitor : Visitor): Any? {
         return visitor.visitString(this)
     }
 

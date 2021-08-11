@@ -3,18 +3,15 @@ package yaj.backend.ast
 import yaj.backend.ast.visitor.Visitor
 import kotlin.String
 
-class GetVar(name: String, scope: Scope): Var() {
+class GetVar(name: String): Var() {
     val name = name
-    override val scope = scope
 
-    override fun visit(visitor: Visitor): Node {
+    override fun visit(visitor: Visitor): Any? {
         return visitor.visitVarGet(this)
     }
 
     override fun toPrint(): String {
-        var value = scope.getVar(name)
-
-        return value.toPrint()
+        return toString()
     }
 
     override fun toString(): String {

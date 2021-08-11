@@ -121,12 +121,12 @@ class Scope(parent: Scope?) {
     }
 }
 
-class Scene(nodes: MutableList<Node>, scope: Scope): Node() {
+class Scene(nodes: MutableList<Node>): Node() {
     val nodes = nodes
 
-    var scope = scope
+    val params: MutableList<FuncParam> = mutableListOf<FuncParam>()
 
-    override fun visit(visitor: Visitor): Node? {
+    override fun visit(visitor: Visitor): Any? {
         return visitor.visitScene(this)
     }
 
@@ -134,10 +134,6 @@ class Scene(nodes: MutableList<Node>, scope: Scope): Node() {
         var stringBuilder = StringBuilder()
 
         var indent = StringBuilder()
-
-        for (i in 1..scope.nestedLevel) {
-            indent.append("    ")
-        }
 
         var indentStr = indent.toString()
 
@@ -153,25 +149,6 @@ class Scene(nodes: MutableList<Node>, scope: Scope): Node() {
         }
         stringBuilder.append(indentStr)
         stringBuilder.append(")")
-
-
-        if (scope.funcs.isNotEmpty() || scope.vars.isNotEmpty()){
-            stringBuilder.append("\n${indentStr}Variables(")
-
-            stringBuilder.append(indentStr)
-            stringBuilder.append(hashMapToString(scope.vars))
-
-            stringBuilder.append(indentStr)
-            stringBuilder.append("\n)\n")
-
-            stringBuilder.append(indentStr)
-            stringBuilder.append("Functions(")
-
-            stringBuilder.append(indentStr)
-            stringBuilder.append(hashMapToString(scope.funcs))
-
-            stringBuilder.append("\n$indentStr)")
-        }
 
         return stringBuilder.toString()
     }

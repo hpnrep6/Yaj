@@ -6,7 +6,7 @@ import kotlin.String
 class Number (value : Double) : Value() {
     override val value = value
 
-    override fun visit(visitor : Visitor): Number {
+    override fun visit(visitor : Visitor): Any? {
         return visitor.visitNumber(this)
     }
 

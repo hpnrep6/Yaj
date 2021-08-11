@@ -5,7 +5,7 @@ import yaj.backend.ast.visitor.Visitor
 class Print(node: Node): Node() {
     val node = node
 
-    override fun visit(visitor: Visitor): Unit {
+    override fun visit(visitor: Visitor): Any? {
         return visitor.visitPrint(this)
     }
 

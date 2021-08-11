@@ -8,7 +8,7 @@ open class BoolBinary(left: Node, right: Node, operator: (Bool, Bool) -> Bool): 
     val right = right
     val operator = operator
 
-    override fun visit(visitor: Visitor): Bool {
+    override fun visit(visitor: Visitor): Any? {
         return visitor.visitBoolBinary(this)
     }
 
@@ -21,7 +21,7 @@ open class BoolUnary(left: Node, operator: (Bool) -> Bool): Node() {
     val left = left
     val operator = operator
 
-    override fun visit(visitor: Visitor): Bool {
+    override fun visit(visitor: Visitor): Any? {
         return visitor.visitBoolUnary(this)
     }
 
@@ -53,7 +53,7 @@ open class BoolComparison(left: Node, right: Node, equals: Boolean): Node() {
     val right = right
     val equals = equals
 
-    override fun visit(visitor: Visitor): Bool {
+    override fun visit(visitor: Visitor): Any? {
         return visitor.visitBoolComparison(this)
     }
 
@@ -71,7 +71,7 @@ open class NumComparison(left: Node, right: Node, operator: (Number, Number) -> 
     val right = right
     val operator = operator
 
-    override fun visit(visitor: Visitor): Bool {
+    override fun visit(visitor: Visitor): Any? {
         return visitor.visitNumComparison(this)
     }
 

@@ -6,7 +6,7 @@ import kotlin.String
 class Bool(value: Boolean): Value() {
     override val value = value
 
-    override fun visit(visitor: Visitor): Bool {
+    override fun visit(visitor: Visitor): Any? {
         return visitor.visitBool(this)
     }
 

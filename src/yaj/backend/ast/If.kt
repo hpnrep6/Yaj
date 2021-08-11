@@ -8,7 +8,7 @@ class If(booleanOperation: Node, scene: Scene, otherwise: Scene? = null): Node()
     val scene = scene
     val otherwise = otherwise // else, but that's a reserved keyword in kotlin
 
-    override fun visit(visitor: Visitor): Node? {
+    override fun visit(visitor: Visitor): Any? {
         return visitor.visitIf(this)
     }
 
