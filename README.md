@@ -33,6 +33,8 @@ An abstract syntax tree interpreter for the Yaj programming language (with very 
   - Function parameters
   - Function calls
   - Function return values
+- Comments
+  - Single-line comments
 - Scope
   - Variable shadowing
   - Outer scope variable lookup
@@ -148,6 +150,8 @@ stringConcat = (string | identifier | number | function_call), ["+", stringConca
 
 out = "Out", "(", stringConcat, ")" ;
 
+comment = ",," ;
+
 if_statement = "if", "(", boolExpr, ")", "{", scene, [else_statement] ;
 
 else_statement = "else", scene ;
@@ -174,7 +178,8 @@ scene = [{(
     procedure_call |
     function_decl |
     procedure_call
-    ), endl}], 
+    ), 
+    endl }], 
     ("}" | ? EOF ? ) ;
 
 yaj_program = scene ;
