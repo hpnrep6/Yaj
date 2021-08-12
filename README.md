@@ -51,6 +51,7 @@ An abstract syntax tree interpreter for the Yaj programming language (with very 
 
 ### Input
 ```
+,, Fibonacci sequence
 func fib(iter) {
     if (iter <= 1) {
         return iter

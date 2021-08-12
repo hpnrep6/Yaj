@@ -243,6 +243,23 @@ class Lexer(interpreter: YajInterpreter) {
     }
 
     /**
+     * Skip over blank spaces
+     */
+    fun skipLine() {
+        while (!atEnd()) {
+            if (source[index] != '\n') {
+                increment()
+            } else {
+                if (!atEnd()) {
+                    increment()
+                    newLine()
+                }
+                return
+            }
+        }
+    }
+
+    /**
      * Create number token
      */
     fun handleDigit() {
@@ -435,7 +452,13 @@ class Lexer(interpreter: YajInterpreter) {
             ']' -> addToken(TokenType.BRACK_R)
             '(' -> addToken(TokenType.PAREN_L)
             ')' -> addToken(TokenType.PAREN_R)
-            ',' -> addToken(TokenType.COMMA)
+            ',' -> {
+                if (peekIs(',')) {
+                    return skipLine()
+                } else {
+                    addToken(TokenType.COMMA)
+                }
+            }
             ';' -> addToken(TokenType.SEMICOLON)
             '.' -> {
                 if (peekIs('.')) {
