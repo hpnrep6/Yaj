@@ -13,7 +13,7 @@ An abstract syntax tree interpreter for the Yaj programming language (with very 
   - Else
   - Or (Syntactic sugar for `else if`)
 - Expressions
-  - Maths
+  - Arithmetic
   - Boolean
     - Boolean operations
     - Boolean comparisons
@@ -100,74 +100,65 @@ fun main(args: Array<String>) {
 
 ## Extended Backus-Naur form Grammar
 ```
+(* characters *)
 alpha = ? ASCII characters A to Z, a to z, À and onwards ? ;
-
 numerical = ? ASCII characters 0 to 9 ? ;
-
 alphanumerical = alpha | numerical ;
-
 new_line = ? new line character ? ;
-
 all_characters = ? all visible characters ? - new_line ;
-
 endl = new_line | ";" ;
 
+(* string *)
 string_definition = "'" | """ ;
-
 string_regular = string_definition, all_characters - string_definition, string_definition ;
-
 string_multiline = "`", (all_characters | new_line) - "`" , "`" ;
 
+(* number *)
 number = numerical, { numerical }, ["."], { numerical } ;
 
+(* variables *)
 identifier = alphanumerical, { alphanumerical } ;
-
 operation = expr | boolExpr | stringConcat | identifier ;
-
 assign = identifier, ":=", operation ;
-
 var_decl = "var", assign ;
 
+(* arithmetic *)
 num = ( number | identifier | function_call | ("(", expr, ")") ) | ( ( "+" | "-" ), num ) ;
-
 add_sub = num, [ ("+" | "-"), mult_div] ;
-  
 mult_div = num, [ ("*", "/", "%"), num] ;
-
 expr = mult_div, add_sub ;
 
+(* boolean/logical *)
 bool = "true" | "false" ;
-
 comparison = "=" | ">" | ">=" | "<" | "<=" ;
-
 bool_op_unary = ["!"], bool | function_call | identifier | bool_op_unary ;
-
 bool_op_bin = bool, ("&" | "|"), bool_op_unary ;
-
 boolExpr = bool_op_unary, [{bool_op_bin}] ;
 
+(* string manipulation *)
 stringConcat = (string | identifier | number | function_call), ["+", stringConcat] ;
 
+(* output *)
 out = "Out", "(", stringConcat, ")" ;
 
+(* code comments *)
 comment = ",," ;
 
+(* conditional statements *)
 if_statement = "if", "(", boolExpr, ")", "{", scene, [else_statement] ;
-
 else_statement = "else", scene ;
 
+(* loops *)
 while_loop = "while", "(", boolExpr, ")", "{", scene ;
 
+(* functions *)
 procedure_decl = "proc", identifier, ["()"], "{", scene ;
-
 procedure_call = identifier, "(", ")" ;
-
 function_decl = "func", identifier, "(", identifier, { ",", identifier } , ")", "{", scene ;
-
 function_call = identifier, "(", operation, [{ ",", operation }], ")" ;
-
 return = "return", "(", operation, ")" ;
 
+(* main program *)
 scene = [{(
     var_decl | 
     assign | 
@@ -181,7 +172,7 @@ scene = [{(
     ), 
     endl }], 
     ("}" | ? EOF ? ) ;
-
+    
 yaj_program = scene ;
 ```
 
