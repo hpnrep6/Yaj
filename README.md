@@ -1,6 +1,6 @@
 ## Yaj Interpreter
 
-An abstract syntax tree interpreter for the Yaj programming language (with very unoriginal syntax).
+An abstract syntax tree interpreter.
   
 ## Features
  
