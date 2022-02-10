@@ -332,7 +332,6 @@ class Parser(interpreter: YajInterpreter) {
         )
     }
 
-
     fun assign(variable: Var): Node? {
         if (curIs(TokenType.ASSIGN_V, false)) {
             consume(TokenType.ASSIGN_V) ?: return null
