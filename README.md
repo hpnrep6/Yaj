@@ -8,6 +8,7 @@ An abstract syntax tree interpreter.
   - Number (Double-precision floating points)
   - String (Strings)
   - Bool (Booleans)
+  - Basic type casting
 - Control structures
   - If
   - Else
@@ -122,8 +123,14 @@ operation = expr | boolExpr | stringConcat | identifier ;
 assign = identifier, ":=", operation ;
 var_decl = "var", assign ;
 
+(* type casting *)
+castBool = "Bool", "(", boolExpr, ")" ;
+castNum = "Num", "(", expr, ")" ;
+castString = "String", "(", stringConcat, ")" ;
+cast = castBool | castNum | castString ;
+
 (* arithmetic *)
-num = ( number | identifier | function_call | ("(", expr, ")") ) | ( ( "+" | "-" ), num ) ;
+num = ( number | identifier | function_call | cast | ("(", expr, ")") ) | ( ( "+" | "-" ), num ) ;
 add_sub = num, [ ("+" | "-"), mult_div] ;
 mult_div = num, [ ("*", "/", "%"), num] ;
 expr = mult_div, add_sub ;
@@ -131,12 +138,12 @@ expr = mult_div, add_sub ;
 (* boolean/logical *)
 bool = "true" | "false" ;
 comparison = "=" | ">" | ">=" | "<" | "<=" ;
-bool_op_unary = ["!"], bool | function_call | identifier | bool_op_unary ;
+bool_op_unary = ["!"], bool | function_call | identifier | bool_op_unary | cast ;
 bool_op_bin = bool, ("&" | "|"), bool_op_unary ;
 boolExpr = bool_op_unary, [{bool_op_bin}] ;
 
 (* string manipulation *)
-stringConcat = (string | identifier | number | function_call), ["+", stringConcat] ;
+stringConcat = (string | identifier | number | cast | function_call), ["+", stringConcat] ;
 
 (* output *)
 out = "Out", "(", stringConcat, ")" ;
