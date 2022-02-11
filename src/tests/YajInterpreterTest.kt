@@ -265,4 +265,27 @@ internal class YajInterpreterTest {
 
         assertEquals(interpreter_recursion_expected, interpreter.output.toString())
     }
+
+    val interpreter_casting_expected = """
+        eee223
+        3true
+        true
+        
+    """.trimIndent()
+
+    @Test
+    fun interpreter_casting() {
+        val string = readFile("parser_casting.yaj");
+        val interpreter = outputWrangler(string)
+
+        var tokens = interpreter.lex()
+
+        var node = interpreter.parse(tokens)
+
+        var exec = Execute(interpreter)
+
+        node.visit(exec)
+
+        assertEquals(interpreter_casting_expected, interpreter.output.toString())
+    }
 }

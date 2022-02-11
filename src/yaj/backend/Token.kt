@@ -63,6 +63,11 @@ enum class TokenType {
     BOOL,           // true / false
     NONE_LIT,       // none ; null
 
+// Casting
+    CAST_NUM,       // Num
+    CAST_STR,       // String
+    CAST_BOOL,      // Bool
+
 // Boolean
     NOT,            // !
     OR,             // |

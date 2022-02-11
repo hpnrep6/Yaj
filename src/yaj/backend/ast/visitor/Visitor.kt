@@ -37,4 +37,8 @@ abstract class Visitor {
 
     abstract fun visitFor(node : Node): Any?
     abstract fun visitWhile(node : While): Any?
+
+    abstract fun visitCastNum(node: CastNum): Any?
+    abstract fun visitCastString(node: CastString): Any?
+    abstract fun visitCastBool(node: CastBool): Any?
 }

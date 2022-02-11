@@ -136,4 +136,16 @@ class Printer(interpreter: YajInterpreter, scope: Scope): Visitor() {
     override fun visitWhile(node: While): String {
         return node.toString()
     }
+
+    override fun visitCastBool(node: CastBool): Any? {
+        return node.expression.visit(this)
+    }
+
+    override fun visitCastNum(node: CastNum): Any? {
+        return node.expression.visit(this)
+    }
+
+    override fun visitCastString(node: CastString): Any? {
+        return node.expression.visit(this)
+    }
 }

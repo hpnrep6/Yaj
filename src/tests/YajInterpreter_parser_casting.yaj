@@ -1,0 +1,13 @@
+var a := Num(3)
+var c := String("eee") + String("22") + a
+
+var d := Bool(true)
+
+if (d & true) {
+    Out(c)
+}
+
+Out(String(Num(3)) + String(d))
+
+var out := Bool(Num(9 % 6) = 3)
+Out(out)

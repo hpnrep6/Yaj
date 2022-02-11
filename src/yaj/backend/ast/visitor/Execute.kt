@@ -239,7 +239,6 @@ open class Execute(interpreter: YajInterpreter, parent: Scope? = null): Visitor(
         return null
     }
 
-
     /**
      * Loop
      */
@@ -262,5 +261,53 @@ open class Execute(interpreter: YajInterpreter, parent: Scope? = null): Visitor(
         }
 
         return returnValue
+    }
+
+    override fun visitCastNum(node: CastNum): yaj.backend.ast.Number {
+        val expression = node.expression
+        val evaluated = expression.visit(this)
+
+        var value = (evaluated as Value).value
+
+        if (value is Boolean) {
+            if (value) {
+                value = 1
+            } else {
+                value = 0
+            }
+        } else if (value is kotlin.String) {
+            value = 0
+        }
+        return yaj.backend.ast.Number(value as Double)
+    }
+
+    override fun visitCastString(node: CastString): yaj.backend.ast.String {
+        val expression = node.expression
+        val evaluated = expression.visit(this)
+
+        var value = (evaluated as Value).value
+
+        if (value is Double || value is Boolean) {
+            value = value.toString()
+        }
+        return yaj.backend.ast.String(value as kotlin.String)
+    }
+
+    override fun visitCastBool(node: CastBool): yaj.backend.ast.Bool {
+        val expression = node.expression
+        val evaluated = expression.visit(this)
+
+        var value = (evaluated as Value).value
+
+        if (value is Double) {
+            if (value != 0) {
+                value = false
+            } else {
+                value = true
+            }
+        } else if (value is kotlin.String) {
+            value = value.lowercase() != "false"
+        }
+        return yaj.backend.ast.Bool((evaluated as Value).value as Boolean)
     }
 }

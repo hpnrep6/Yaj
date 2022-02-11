@@ -400,13 +400,15 @@ class Parser(interpreter: YajInterpreter) {
             TokenType.MULT,
             TokenType.DIV,
             TokenType.POW,
-            TokenType.MOD -> {
+            TokenType.MOD,
+            TokenType.CAST_NUM -> {
                 val evaluated = expr()
 
                 return evaluated
             }
 
-            TokenType.STRING -> {
+            TokenType.STRING,
+            TokenType.CAST_STR -> {
                 return stringConcat()
             }
 
@@ -419,9 +421,11 @@ class Parser(interpreter: YajInterpreter) {
             TokenType.GREATER_EQUALS,
             TokenType.GREATER,
             TokenType.LESS,
-            TokenType.LESS_EQUALS -> {
+            TokenType.LESS_EQUALS,
+            TokenType.CAST_BOOL -> {
                 return boolExpr()
             }
+
 
             else -> {
                 return null
@@ -472,6 +476,14 @@ class Parser(interpreter: YajInterpreter) {
                     formatNumber((tokens[index++].value as Double).value)
                 )
             }
+
+            TokenType.CAST_NUM,
+            TokenType.CAST_STR,
+            TokenType.CAST_BOOL -> {
+                return cast()
+            }
+
+
             else -> {
                 error()
                 return null
@@ -494,7 +506,10 @@ class Parser(interpreter: YajInterpreter) {
                 when (tokens[index].type) {
                     TokenType.STRING,
                     TokenType.IDENTIFIER,
-                    TokenType.DOUBLE -> {
+                    TokenType.DOUBLE,
+                    TokenType.CAST_NUM,
+                    TokenType.CAST_STR,
+                    TokenType.CAST_BOOL-> {
                         return StringConcat(root, stringConcat())
                     }
                 }
@@ -506,6 +521,42 @@ class Parser(interpreter: YajInterpreter) {
         return root
     }
 
+    /**
+     * Casting
+     */
+
+    fun cast(): Node {
+        when(tokens[index].type) {
+            TokenType.CAST_NUM -> {
+                ++index
+                consume(TokenType.PAREN_L)
+                var node = expr()
+                consume(TokenType.PAREN_R)
+                return CastNum(node)
+            }
+
+            TokenType.CAST_BOOL -> {
+                ++index
+                consume(TokenType.PAREN_L)
+                var node = boolExpr()
+                consume(TokenType.PAREN_R)
+                return CastBool(node)
+            }
+
+            TokenType.CAST_STR -> {
+                ++index
+                consume(TokenType.PAREN_L)
+                var node = stringConcat()
+                consume(TokenType.PAREN_R)
+                return CastString(node)
+            }
+
+            else -> {
+                error()
+                return CastNum(expr())
+            }
+        }
+    }
 
     /**
      * Boolean
@@ -551,6 +602,12 @@ class Parser(interpreter: YajInterpreter) {
 
             TokenType.STRING -> {
                 return stringConcat()
+            }
+
+            TokenType.CAST_NUM,
+            TokenType.CAST_STR,
+            TokenType.CAST_BOOL -> {
+                return cast()
             }
 
             else -> {
@@ -611,6 +668,12 @@ class Parser(interpreter: YajInterpreter) {
                 TokenType.GREATER -> {
                     ++index
                     return Greater(root, boolExpr())
+                }
+
+                TokenType.CAST_NUM,
+                TokenType.CAST_STR,
+                TokenType.CAST_BOOL -> {
+                    return cast()
                 }
 
                 else -> {
@@ -717,6 +780,12 @@ class Parser(interpreter: YajInterpreter) {
                 }
 
                 return getVar()
+            }
+
+            TokenType.CAST_NUM,
+            TokenType.CAST_STR,
+            TokenType.CAST_BOOL -> {
+                return cast()
             }
 
             TokenType.PAREN_L -> {

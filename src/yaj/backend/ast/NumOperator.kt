@@ -1,6 +1,7 @@
 package yaj.backend.ast
 
 import yaj.backend.ast.visitor.Visitor
+import kotlin.String
 
 abstract class Binary (left : Node, operator : (Number, Number) -> Number, right : Node) : Node() {
     val left = left

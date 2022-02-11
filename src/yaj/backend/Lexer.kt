@@ -26,6 +26,10 @@ fun initialistKeywords() : HashMap<kotlin.String, TokenType> {
     keywordMap.put("while", TokenType.WHILE)
     keywordMap.put("forever", TokenType.FOREVER)
 
+    keywordMap.put("Num", TokenType.CAST_NUM)
+    keywordMap.put("String", TokenType.CAST_STR)
+    keywordMap.put("Bool", TokenType.CAST_BOOL)
+
     return keywordMap
 }
 
